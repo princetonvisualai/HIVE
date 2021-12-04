@@ -1,0 +1,106 @@
+<div id='part_choice' style="display: none;">
+
+  <div class='container-fluid'>
+
+    <div class='container-fluid'>
+      <h1>Choose which model to use</h1>
+      <br>
+      <p>
+        The BagNet model achieves an overall accuracy of <b><span id="origacc"></span>%</b> in 1000 image classification.
+      </p>
+      <p>
+        You correctly selected the model&#39; predictions for <b><span id="correctcount_copy"></span>
+        out of <span id="correcttotal_copy"></span></b> photos in the previous task,
+        achieving <b><span id="correctacc_copy"></span>%</b> accuracy.
+        (Random guessing will result in 25% accuracy.)
+      </p>
+      <p>
+        You identified correct classes for <b><span id="correctcount2_copy"></span>
+        out of <span id="correcttotal2_copy"></span></b> photos in the previous task,
+        achieving <b><span id="correctacc2_copy"></span>%</b> accuracy.
+        (Random guessing will result in 25% accuracy.)
+      </p>
+      <p>Alternatively, you can use a <b>Black-box</b> model that doesn&#39;t come with an explanation of its prediction.</p>
+    </div>
+
+    <hr>
+
+    <div class='container-fluid'>
+      <h3>
+        Q. What is the minimum accuracy of the Black-box model that would convince
+        you to use the Black-box model over the BagNet model?
+      </h3>
+    </div>
+
+    <div class='container-fluid'>
+      <p>
+        <b>[Low-risk] Scientific or educational purposes.</b>
+        E.g. You have a stack of images and want to know their classes in a lab and/or a classroom.
+      </p>
+      Recall that the BagNet model achieves <span id="origacc_copy1"></span>% accuracy.
+      <br>
+      <br>
+      <div class='col-xs-10'>
+        <div id="slider-low"></div>
+        <br>
+        <p>Selected Black-box model accuracy: <b><span id="low_risk"></span>%</b></p>
+      </div>
+    </div>
+
+    <br>
+    <br>
+
+    <div class='container-fluid'>
+      <p>
+        <b>[Medium-risk] Object recognition for automatic grocery checkout.</b>
+        E.g. The model will recognize what's in a shopping cart and charge customers with the corresponding price.
+      </p>
+      Recall that the BagNet model achieves <span id="origacc_copy2"></span>% accuracy.
+      <br>
+      <br>
+      <div class='col-xs-10'>
+        <div id="slider-med"></div>
+        <br>
+        <p>Selected Black-box model accuracy: <b><span id="med_risk"></span>%</b></p>
+      </div>
+    </div>
+
+    <br>
+    <br>
+
+    <div class='container-fluid'>
+      <p>
+        <b>[High-risk] Scene understanding for self-driving cars.</b>
+        E.g. The model will help an autonomous driving system identify what it sees and make driving decisions.
+      </p>
+      Recall that the BagNet model achieves <span id="origacc_copy3"></span>% accuracy.
+      <br>
+      <br>
+      <div class='col-xs-10'>
+        <div id="slider-high"></div>
+        <br>
+        <p>Selected Black-box model accuracy: <b><span id="high_risk"></span>%</b></p>
+      </div>
+    </div>
+
+    <br>
+    <hr>
+
+    <div class='container-fluid'>
+      <div class='row'>
+        <div class='col-xs-12'>
+          <h3>Briefly describe the reason for your choices.</h3>
+          <textarea id='text-area' name='text-area' class='form-control tb-margin'></textarea>
+        </div>
+      </div>
+    </div>
+
+    <br><br>
+
+    <div class='container-fluid' id='button-div'>
+      <button class='btn btn-lg btn-primary' id="next_choice2feedback" onclick="pg_choice2feedback()">Next Page</button>
+    </div>
+
+  </div>
+
+</div>

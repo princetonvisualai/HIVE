@@ -1,0 +1,584 @@
+<html>
+  <head>
+    <title></title>
+    <!-- simpleamt depends on these libraries -->
+    <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js'></script>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/json3/3.3.2/json3.min.js'></script>
+    <!-- end of required libraries -->
+    <script src='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js'></script>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js'></script>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      #text-area {
+        margin: 10px 0;
+        font-size: 24pt;
+      }
+      #button-div {
+        margin-bottom: 10px;
+      }
+      #counter {
+        margin: 0 10px;
+        font-size: 20pt;
+        font-weight: bold;
+      }
+      p {
+        font-size: 18px;
+      }
+      hr {
+        display: block;
+        height: 1px;
+        border-top: 1px solid #ccc;
+        margin: 1em 0;
+        padding: 0;
+      }
+      li {
+        font-size: 18px;
+      }
+      .row_special {
+        display: grid;
+        grid-auto-flow: column;
+        gap: 10%;
+      }
+      .col_special {
+        display: grid;
+        grid-auto-flow: row;
+        align-items: center;
+      }
+      .double {
+        zoom: 1.5;
+        transform: scale(2);
+        -ms-transform: scale(2);
+        -webkit-transform: scale(2);
+        -o-transform: scale(2);
+        -moz-transform: scale(2);
+        transform-origin: 0 0;
+        -ms-transform-origin: 0 0;
+        -webkit-transform-origin: 0 0;
+        -o-transform-origin: 0 0;
+        -moz-transform-origin: 0 0;
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <div class='container-fluid' id='part_task' style="display: none; ">
+
+      <!-- Instructions -->
+      <div class='container-fluid'>
+        <h1>Simulate the model</h1>
+        <p>
+          Given a bird photo, the ProtoPNet model predicts the species based on prototypes it has learned from
+          previously seen photos.
+          Specifically for each prototype, the model identifies a region in the
+          photo that looks the most similar to the prototype and rates their similarity.
+        </p>
+        <p>
+          <b>
+            For a given photo, we show explanations of how the model reasons for 4 bird species.
+            For each bird species, rate how similar each prototype is
+            to the photo region.
+            Note that the (region, prototype) pairs are presented in random order.
+            At the end, choose the bird species you think is correct.
+          </b>
+        </p>
+        <p>
+          Random guessing will get you 25% accuracy.
+          You will receive a reward based on your performance beyond this 25% random chance.
+        </p>
+      </div>
+
+      <hr><br>
+
+      <!-- Photo and explanation -->
+      <div class='container-fluid'>
+        <div class='col-xs-3 text-center'>
+          <div class='col-xs-11 text-center'>
+            <p>Photo</p>
+            <div id='testimage-container'></div>
+          </div>
+          <br><br>
+          <div class='col-xs-11 text-left'>
+            <br>
+            <p>
+              <b>Prototypes and their source photos are from the specified species.</b>
+              <br><br>
+              That is, Species 1 explanation only contains the prototypes and the prototype's photos from Species 1.
+            </div>
+        </div>
+
+        <div class='col-xs-9 text-left'>
+          <h3>Task: Rate the similarity of each prototype-region pair on a scale of 1-4.</h3>
+          <p><b>
+            1: Not Similar<br>
+            2: Somewhat Not Similar<br>
+            3: Somewhat Similar<br>
+            4: Similar
+          </b></p>
+          <br>
+          <p>
+            Click on &#34;Species 1&#34;, &#34;Species 2&#34;, &#34;Species 3&#34;
+            and &#34;Species 4&#34; to move between species.
+          </p>
+          <p>
+            For your HIT to be approved, you have to rate all prototypes in all 4 species.
+          </p>
+          <br>
+          <div class='row'>
+            <div class='col-xs-12'>
+              <ul class="nav nav-tabs">
+                <li role="presentation" id='class1tab' class="active" onclick="$('#class1').show();$('#class2').hide();$('#class3').hide();$('#class4').hide();$(this).addClass('active'); $(class2tab).removeClass('active');$(class3tab).removeClass('active');$(class4tab).removeClass('active');"><a>Species 1</a></li>
+                <li role="presentation" id='class2tab' onclick="$('#class2').show();$('#class1').hide();$('#class3').hide();$('#class4').hide();$(this).addClass('active');$(class1tab).removeClass('active');$(class3tab).removeClass('active');$(class4tab).removeClass('active');"><a>Species 2</a></li>
+                <li role="presentation" id='class3tab' onclick="$('#class3').show();$('#class1').hide();$('#class2').hide();$('#class4').hide();$(this).addClass('active');$(class1tab).removeClass('active');$(class2tab).removeClass('active');$(class4tab).removeClass('active');"><a>Species 3</a></li>
+                <li role="presentation" id='class4tab' onclick="$('#class4').show();$('#class1').hide();$('#class2').hide();$('#class3').hide();$(this).addClass('active');$(class1tab).removeClass('active');$(class2tab).removeClass('active');$(class3tab).removeClass('active');"><a>Species 4</a></li>
+
+              </ul>
+            </div>
+          </div>
+
+          <br>
+
+          <div class='row'></div>
+
+          <div class='col-xs-9' id='class1'>
+            <div class='container-fluid'>
+                <div class='row_special'>
+
+                  <!-- Column 1 -->
+                  <div class='col_special'>
+                    <div id='c1exp-container'>
+                    </div>
+                  </div>
+
+                  <!-- Column 2 -->
+                  <div id='checkboxes_distinction_class1' class='col_special'>
+                    <div  id="row1_class1" class="double">
+                      <input type="radio" name="similarity1_class1" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity1_class1" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity1_class1" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity1_class1" value="4" style="vertical-align:top">4
+                      <!-- <span style="margin-left:5px; font-size:10px">Row 1</span> -->
+                    </div>
+                    <div id="row2_class1" class="double">
+                     <input type="radio" name="similarity2_class1" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity2_class1" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity2_class1" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity2_class1" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row3_class1" class="double">
+                     <input type="radio" name="similarity3_class1" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity3_class1" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity3_class1" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity3_class1" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row4_class1" class="double">
+                     <input type="radio" name="similarity4_class1" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity4_class1" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity4_class1" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity4_class1" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row5_class1" class="double">
+                     <input type="radio" name="similarity5_class1" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity5_class1" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity5_class1" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity5_class1" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row6_class1" class="double">
+                     <input type="radio" name="similarity6_class1" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity6_class1" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity6_class1" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity6_class1" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row7_class1" class="double">
+                     <input type="radio" name="similarity7_class1" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity7_class1" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity7_class1" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity7_class1" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row8_class1" class="double">
+                     <input type="radio" name="similarity8_class1" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity8_class1" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity8_class1" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity8_class1" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row9_class1" class="double">
+                     <input type="radio" name="similarity9_class1" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity9_class1" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity9_class1" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity9_class1" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row10_class1" class="double">
+                      <input type="radio" name="similarity10_class1" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity10_class1" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity10_class1" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity10_class1" value="4" style="vertical-align:top">4
+                    </div>
+                  </div>
+                </div>
+            </div>
+          </div> <!-- End of row selection -->
+
+          <div hidden class='col-xs-9' id='class2'>
+            <div class='container-fluid'>
+                <div class='row_special'>
+
+                  <!-- Column 1 -->
+                  <div class='col_special'>
+                    <div id='c2exp-container'>
+                    </div>
+                  </div>
+
+                  <!-- Column 2 -->
+                  <div id='checkboxes_distinction_class2' class='col_special'>
+                    <div  id="row1_class2" class="double">
+                      <input type="radio" name="similarity1_class2" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity1_class2" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity1_class2" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity1_class2" value="4" style="vertical-align:top">4
+                      <!-- <span style="margin-left:5px; font-size:10px">Row 1</span> -->
+                    </div>
+                    <div id="row2_class2" class="double">
+                     <input type="radio" name="similarity2_class2" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity2_class2" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity2_class2" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity2_class2" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row3_class2" class="double">
+                     <input type="radio" name="similarity3_class2" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity3_class2" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity3_class2" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity3_class2" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row4_class2" class="double">
+                     <input type="radio" name="similarity4_class2" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity4_class2" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity4_class2" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity4_class2" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row5_class2" class="double">
+                     <input type="radio" name="similarity5_class2" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity5_class2" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity5_class2" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity5_class2" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row6_class2" class="double">
+                     <input type="radio" name="similarity6_class2" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity6_class2" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity6_class2" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity6_class2" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row7_class2" class="double">
+                     <input type="radio" name="similarity7_class2" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity7_class2" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity7_class2" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity7_class2" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row8_class2" class="double">
+                     <input type="radio" name="similarity8_class2" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity8_class2" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity8_class2" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity8_class2" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row9_class2" class="double">
+                     <input type="radio" name="similarity9_class2" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity9_class2" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity9_class2" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity9_class2" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row10_class2" class="double">
+                      <input type="radio" name="similarity10_class2" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity10_class2" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity10_class2" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity10_class2" value="4" style="vertical-align:top">4
+                    </div>
+                  </div>
+                </div>
+            </div>
+          </div> <!-- End of row selection -->
+
+          <div hidden class='col-xs-9' id='class3'>
+            <div class='container-fluid'>
+                <div class='row_special'>
+
+                  <!-- Column 1 -->
+                  <div class='col_special'>
+                    <div id='c3exp-container'>
+                    </div>
+                  </div>
+
+                  <!-- Column 2 -->
+                  <div id='checkboxes_distinction_class3' class='col_special'>
+                    <div  id="row1_class3" class="double">
+                      <input type="radio" name="similarity1_class3" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity1_class3" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity1_class3" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity1_class3" value="4" style="vertical-align:top">4
+                      <!-- <span style="margin-left:5px; font-size:10px">Row 1</span> -->
+                    </div>
+                    <div id="row2_class3" class="double">
+                     <input type="radio" name="similarity2_class3" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity2_class3" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity2_class3" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity2_class3" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row3_class3" class="double">
+                     <input type="radio" name="similarity3_class3" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity3_class3" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity3_class3" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity3_class3" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row4_class3" class="double">
+                     <input type="radio" name="similarity4_class3" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity4_class3" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity4_class3" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity4_class3" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row5_class3" class="double">
+                     <input type="radio" name="similarity5_class3" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity5_class3" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity5_class3" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity5_class3" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row6_class3" class="double">
+                     <input type="radio" name="similarity6_class3" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity6_class3" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity6_class3" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity6_class3" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row7_class3" class="double">
+                     <input type="radio" name="similarity7_class3" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity7_class3" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity7_class3" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity7_class3" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row8_class3" class="double">
+                     <input type="radio" name="similarity8_class3" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity8_class3" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity8_class3" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity8_class3" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row9_class3" class="double">
+                     <input type="radio" name="similarity9_class3" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity9_class3" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity9_class3" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity9_class3" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row10_class3" class="double">
+                      <input type="radio" name="similarity10_class3" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity10_class3" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity10_class3" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity10_class3" value="4" style="vertical-align:top">4
+                    </div>
+                  </div>
+                </div>
+            </div>
+          </div> <!-- End of row selection -->
+
+          <div hidden class='col-xs-9' id='class4'>
+            <div class='container-fluid'>
+                <div class='row_special'>
+
+                  <!-- Column 1 -->
+                  <div class='col_special'>
+                    <div id='c4exp-container'>
+                    </div>
+                  </div>
+
+                  <!-- Column 2 -->
+                  <div id='checkboxes_distinction_class4' class='col_special'>
+                    <div  id="row1_class4" class="double">
+                      <input type="radio" name="similarity1_class4" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity1_class4" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity1_class4" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity1_class4" value="4" style="vertical-align:top">4
+                      <!-- <span style="margin-left:5px; font-size:10px">Row 1</span> -->
+                    </div>
+                    <div id="row2_class4" class="double">
+                     <input type="radio" name="similarity2_class4" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity2_class4" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity2_class4" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity2_class4" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row3_class4" class="double">
+                     <input type="radio" name="similarity3_class4" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity3_class4" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity3_class4" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity3_class4" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row4_class4" class="double">
+                     <input type="radio" name="similarity4_class4" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity4_class4" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity4_class4" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity4_class4" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row5_class4" class="double">
+                     <input type="radio" name="similarity5_class4" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity5_class4" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity5_class4" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity5_class4" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row6_class4" class="double">
+                     <input type="radio" name="similarity6_class4" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity6_class4" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity6_class4" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity6_class4" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row7_class4" class="double">
+                     <input type="radio" name="similarity7_class4" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity7_class4" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity7_class4" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity7_class4" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row8_class4" class="double">
+                     <input type="radio" name="similarity8_class4" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity8_class4" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity8_class4" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity8_class4" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row9_class4" class="double">
+                     <input type="radio" name="similarity9_class4" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity9_class4" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity9_class4" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity9_class4" value="4" style="vertical-align:top">4
+                    </div>
+                    <div id="row10_class4" class="double">
+                      <input type="radio" name="similarity10_class4" value="1" style="vertical-align:top">1
+                      <input type="radio" name="similarity10_class4" value="2" style="vertical-align:top">2
+                      <input type="radio" name="similarity10_class4" value="3" style="vertical-align:top">3
+                      <input type="radio" name="similarity10_class4" value="4" style="vertical-align:top">4
+                    </div>
+                  </div>
+                </div>
+            </div>
+          </div> <!-- End of row selection -->
+
+
+        </div>
+
+      </div>
+
+      <br>
+
+      <!-- Question -->
+      <div class='container-fluid'>
+        <h3>Q. Choose the bird species you think is correct, then click &#34;Next Photo.&#34;</h3>
+        <input type="radio"class="form-check-input"  style="height:18px; width:18px; vertical-align:top;" name="sim" value="1" /> <span style="font-size:18px">Species 1 &nbsp;</span>
+        <input type="radio"class="form-check-input" style="height:18px; width:18px; vertical-align:top;" name="sim" value="2" /> <span style="font-size:18px">Species 2 &nbsp;</span>
+        <input type="radio"class="form-check-input"  style="height:18px; width:18px; vertical-align:top;" name="sim" value="3" /> <span style="font-size:18px">Species 3</span>
+        <input type="radio"class="form-check-input"  style="height:18px; width:18px; vertical-align:top;" name="sim" value="4" /> <span style="font-size:18px">Species 4</span><br>
+
+      </div>
+
+      <br>
+
+      <!-- Confidence Question -->
+      <div class='container-fluid'>
+        <h3>Q. How confident are you in your answer?</h3>
+        <form action="" method="post">
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence_task" value="1"/>
+          <span style="font-size:18px">Not confident at all</span>
+          <br>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence_task" value="2"/>
+          <span style="font-size:18px">Slightly confident</span>
+          <br>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence_task" value="3"/>
+          <span style="font-size:18px">Somewhat confident</span>
+          <br>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence_task" value="4"/>
+          <span style="font-size:18px">Fairly confident</span>
+          <br>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence_task" value="5"/>
+          <span style="font-size:18px">Completely confident</span>
+        </form>
+      </div>
+
+
+      <!-- Next image -->
+      <div class='container-fluid' id='button-div'>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id='counter'><span class='counter-top'></span> / <span class='counter-bottom'></span></span>
+        <br>
+        <button id='next_btn' style='background-color:#FFAC1C; border:none;' class='btn btn-lg btn-primary' onclick="record();" disabled>Next Photo</button>
+        <br>
+        If you can't click  "Next Photo" after rating all prototypes and answering both questions, try clicking on a different answer and then click on your desired answer.
+      </div>
+
+      <br><hr>
+
+      <!--Next page instructions-->
+      <div class='container-fluid'>
+        <h3>Click &#34;Next Page&#34; after selecting answers for all 4 photos.</h3>
+      </div>
+
+      <br>
+
+      <!-- Next page -->
+      <div class='col-xs-12' id='button-div'>
+        <button class='btn btn-lg btn-primary' id='next_task2post' onclick="record(); pg_task2post();">Next Page</button>
+      </div>
+
+      <br><hr>
+
+      <!-- Model description instructions -->
+      <div class='container-fluid'>
+        <h3>Click &#34;Model Description&#34; to open or close model description.</h3>
+      </div>
+
+      <br>
+
+      <!-- Model description button -->
+      <div class='container-fluid' id='button-div'>
+          <button class='btn btn-lg btn-primary' style="background-color:#4CAF50; border:none;" autofocusid='display_method' onclick="pg_method();">Model Description</button>
+      </div>
+
+      <!-- Model description -->
+      <div class='container-fluid' id="part_method" style="display: none; ">
+        <div class='col-xs-8' style="border:1px solid black;">
+          {% include "hit_templates/intro_protopnet.html" %}
+          <br><br>
+        </div>
+        <br><br><br>
+      </div>
+
+    </div> <!-- End of part_task -->
+  </body>
+</html>
+
+<script>
+  // $(function() {$("input[name='subjective']").change(function(){next6_to_7.disabled = false;})});
+  function recordtask1sim() {
+    // var class_selection = document.querySelector('input[name = "task1"]:checked').value;
+    $('#task2table').show();
+  };
+  // update the text and background color
+  function updateselection(tr_id) {
+    var currentClass = tr_id.className;
+    // if 'info' (Not selected), change class to 'danger' and text 'Not Similar'
+    if (currentClass == 'info') {
+      counter++;
+      tr_id.className='danger';
+      // set the last child's text equal to 'Not Similar'
+      tr_id.childNodes[3].innerHTML = 'Not Similar';
+    }
+
+    if (currentClass == 'danger') {
+      tr_id.className='warning';
+      // set the last child's text equal to 'Not Similar'
+      tr_id.childNodes[3].innerHTML = 'Somewhat Similar';
+    }
+
+    // if danger, change to succes and 'Obviously Similar')
+    if (currentClass == 'warning') {
+      tr_id.className='success';
+      // set the last child's text equal to 'Not Similar'
+      tr_id.childNodes[3].innerHTML = 'Obviously Similar'
+    }
+
+    // if success, change to info and 'Somewhat Similar'
+    if (currentClass == 'success') {
+      counter--;
+      tr_id.className='info';
+      // set the last child's text equal to 'Not Similar'
+      tr_id.childNodes[3].innerHTML = 'Click on Prototype to indicate selection'
+    }
+  };
+</script>

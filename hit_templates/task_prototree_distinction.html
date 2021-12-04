@@ -1,0 +1,202 @@
+<div class='container-fluid' id='part_task' style="display: none; ">
+
+  <!-- Instructions -->
+  <div class='container-fluid'>
+    <h1>Predict the bird species</h1>
+    <p>
+      Given a bird photo, the ProtoTree model predicts the species based on prototypes it has learned from
+      previously seen photos.
+      Specifically at each step, the model identifies a region in the
+      photo that looks the most similar to the step&#39;s prototype and
+      judges whether the prototype is absent or present in the photo.
+    </p>
+    <p>
+      <b>
+        For each photo, we show the model&#39;s decisions for the first several steps.
+        For the remaining final two steps, you will decide whether the prototypes
+        are absent or present in the photo, which will lead to a bird species prediction.
+      </b>
+    </p>
+    <p>
+      Random guessing will get you 25% accuracy.
+      You will receive a reward based on your performance beyond this 25% random chance.
+    </p>
+  </div>
+
+  <hr>
+
+  <!-- Photo and prediction -->
+  <div class='container-fluid'>
+
+    <!-- Photo -->
+    <div class='col-xs-2 text-center'>
+      <h3>Photo</h3>
+      <div id='testimage-container'></div>
+    </div>
+
+    <div class='col-xs-1'></div>
+
+    <!-- Explanation -->
+    <div class='col-xs-7 text-center'>
+      <h3>Model&#39;s decisions for the first several steps</h3>
+      <br>
+      <div id='pdf-container'></div>
+    </div>
+
+  </div>
+
+  <hr>
+
+  <!-- Options -->
+  <div class='container-fluid'>
+    <div class='col-xs-12'>
+      <h2>Possible decisions for the final two steps</h2>
+    </div>
+  </div>
+
+  <br>
+
+  <div class='container-fluid'>
+    <div class='col-xs-9' style="border:1px dotted gray;">
+      <div id='option1-container'></div>
+      <br>
+      <h3>Q1. Do you think this prototype absent or present in the photo?</h3>
+      <form action="" method="post">
+        <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="disagree1" value="Absent"/>
+        <span style="font-size:18px">Absent &nbsp;</span>
+        <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="disagree1" value="Present"/>
+        <span style="font-size:18px">Present &nbsp;</span>
+      </form>
+    </div>
+  </div>
+
+  <br>
+
+  <div class='container-fluid'>
+    <div class='col-xs-9' style="border:1px dotted gray;">
+      <h3>If you selected &#34;Absent&#34; in Q1:</h3>
+      <div id='option2-container'></div>
+      <br>
+      <h3>Q2-1. Do you think this prototype is absent or present in the photo?</h3>
+      <form action="" method="post">
+        <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="disagree2" value="Absent"/>
+        <span style="font-size:18px">Absent &nbsp;</span>
+        <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="disagree2" value="Present"/>
+        <span style="font-size:18px">Present &nbsp;</span>
+      </form>
+    </div>
+  </div>
+
+  <br>
+
+  <div class='container-fluid'>
+    <div class='col-xs-9' style="border:1px dotted gray;">
+      <h3>If you selected &#34;Present&#34; in Q1:</h3>
+      <div id='option3-container'></div>
+      <br>
+      <h3>Q2-2. Do you think this prototype is absent or present in the photo?</h3>
+      <form action="" method="post">
+        <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="disagree3" value="Absent"/>
+        <span style="font-size:18px">Absent &nbsp;</span>
+        <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="disagree3" value="Present"/>
+        <span style="font-size:18px">Present &nbsp;</span>
+      </form>
+    </div>
+  </div>
+
+  <br>
+
+  <!-- Additional info -->
+  <div class='container-fluid'>
+    <div class='col-xs-12'>
+      <h3>Predicted bird species</h3>
+      <p>
+        If you choose <b>Absent</b> in Q1 and <b>Absent</b> in Q2, you will arrive at the prediction <b>Species 1</b>.<br>
+        If you choose <b>Absent</b> in Q1 and <b>Present</b> in Q2, you will arrive at the prediction <b>Species 2</b>.<br>
+        If you choose <b>Present</b> in Q1 and <b>Absent</b> in Q2, you will arrive at the prediction <b>Species 3</b>.<br>
+        If you choose <b>Present</b> in Q1 and <b>Present</b> in Q2, you will arrive at the prediction <b>Species 4</b>.
+      </p>
+    </div>
+  </div>
+
+  <br>
+
+  <!-- Confidence -->
+  <div class='container-fluid'>
+    <div class='col-xs-12'>
+    <h3>Q3. How confident are you in your answer?</h3>
+      <form action="" method="post">
+        <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence" value="1"/>
+        <span style="font-size:18px">Not confident at all</span>
+        <br>
+        <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence" value="2"/>
+        <span style="font-size:18px">Slightly confident</span>
+        <br>
+        <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence" value="3"/>
+        <span style="font-size:18px">Somewhat confident</span>
+        <br>
+        <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence" value="4"/>
+        <span style="font-size:18px">Fairly confident</span>
+        <br>
+        <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence" value="5"/>
+        <span style="font-size:18px">Completely confident</span>
+      </form>
+    </div>
+  </div>
+
+  <br><hr>
+
+  <!-- Next image -->
+  <div class='container-fluid'>
+    <h3>Click &#34;Next Photo&#34; after answering both questions.</h3>
+  </div>
+  <div class='container-fluid' id='button-div'>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id='counter'><span class='counter-top'></span> / <span class='counter-bottom'></span></span>
+    <br>
+    <button id='next_btn' style='background-color:#FFAC1C; border:none;' class='btn btn-lg btn-primary' onclick="record();" disabled>Next Photo</button>
+  </div>
+
+  <br><hr>
+
+
+  <!-- <br>
+  <div class='container-fluid'>
+    <span id='gt_list'></span>
+    <br>
+    <span id='selected_list'></span>
+  </div>
+  <br> -->
+
+
+
+  <!-- Next page -->
+  <div class='container-fluid'>
+    <h3>Click &#34;Next Page&#34; after selecting answers for all 10 photos.</h3>
+  </div>
+  <br>
+  <div class='container-fluid' id='button-div'>
+    <button disabled class='btn btn-lg btn-primary' id='next_task2post' onclick="record();pg_task2post()">Next Page <i class="arrow right"></i></button>
+  </div>
+
+  <br><hr>
+
+  <!--Method explanation-->
+  <div class='container-fluid'>
+    <h3>Click &#34;Model Description&#34; to open or close model description.</h3>
+  </div>
+  <br>
+  <div class='container-fluid' id='button-div'>
+    <button class='btn btn-lg btn-primary' style="background-color:#4CAF50; border:none;"
+    id='display_method' onclick="pg_method();">Model Description</button>
+  </div>
+  <div class='container-fluid' id="part_method" style="display: none; ">
+    <div class='col-xs-8' style="border:1px solid black;">
+      {% include "hit_templates/intro_prototree.html" %}
+      <br><br>
+    </div>
+    <br><br><br>
+  </div>
+
+  <br><br><br>
+
+</div>

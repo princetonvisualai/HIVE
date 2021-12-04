@@ -1,0 +1,96 @@
+<div class='container-fluid' id='part_choice' style="display: none;">
+  <div class='container-fluid'>
+    <h1>Choose which model to use</h1>
+    <br>
+    <p>
+      The ProtoTree model achieves an overall accuracy of <b><span id="origacc"></span>%</b> in 200 bird species recognition.
+    </p>
+    <p>
+      In the previous task, 5 of 10 photos were correct predictions and the remaining 5 were incorrect predictions.
+      If we assign the 5 predictions with your highest &#34;confident that
+      prediction is correct&#34; rating to correct and the rest as incorrect,
+      <b>
+        you identified <span id="correctcount2"></span> out of <span id="correcttotal2"></span>
+        correct predictions and <span id="wrongcount2"></span> out of <span id="wrongtotal2"></span>
+        incorrect predictions.
+      </b>
+      (When there are ties, we randomly assigned some to correct and some to incorrect.)
+    </p>
+    <p>
+      Alternatively, you can use a <b>Black-box</b> model that doesn&#39;t come with an explanation of its prediction.
+    </p>
+    <br>
+    <br>
+    <h3>Q. What is the minimum accuracy of the Black-box model that would convince you to use the Black-box model over the ProtoPNet model?</h3>
+  </div>
+
+  <br>
+
+  <div class='container-fluid'>
+    <p>
+      <b>[Low-risk setting] Scientific or educational purposes.</b>
+      E.g. You have a stack of bird images and want to know their species in a lab and/or a classroom.
+    </p>
+    Recall that the ProtoPNet model achieves <span id="origacc_copy1"></span>% accuracy.
+    <br>
+    <div class='col-xs-10'>
+      <div id="slider-low"></div>
+      <br>
+      <p>Selected Black-box model accuracy: <b><span id="low_risk"></span>%</b></p>
+    </div>
+  </div>
+
+  <br>
+  <br>
+  <br>
+
+  <div class='container-fluid'>
+    <p>
+      <b>[Medium-risk setting] Biodiversity and ecosystem monitoring.</b>
+      E.g. You want to collect large amounts of bird images and automatically label them.
+    </p>
+    Recall that the ProtoPNet model achieves <span id="origacc_copy2"></span>% accuracy.
+    <br>
+    <div class='col-xs-10'>
+      <div id="slider-med"></div>
+      <br>
+      <p>Selected Black-box model accuracy: <b><span id="med_risk"></span>%</b></p>
+    </div>
+  </div>
+
+  <br>
+  <br>
+  <br>
+
+  <div class='container-fluid'>
+    <p>
+      <b>[High-risk setting] Veterinary science or medical diagnosis.</b>
+      E.g. You have a sick bird and want to identify its species so that it can receive proper treatment and diagnosis.
+    </p>
+    Recall that the ProtoPNet model achieves <span id="origacc_copy3"></span>% accuracy.
+    <br>
+    <div class='col-xs-10'>
+      <div id="slider-high"></div>
+      <br>
+      <p>Selected Black-box model accuracy: <b><span id="high_risk"></span>%</b></p>
+    </div>
+  </div>
+
+  <br>
+  <br>
+
+  <div class='container-fluid'>
+    <div class='row'>
+      <div class='col-xs-12'>
+        <h3>Briefly describe the reason for your choices.</h3>
+        <textarea id='text-area' name='text-area' class='form-control tb-margin'></textarea>
+      </div>
+    </div>
+  </div>
+
+
+  <div class='container-fluid' id='button-div'>
+    <button class='btn btn-lg btn-primary' id="next_choice2feedback" onclick="pg_choice2feedback()">Next Page</button>
+  </div>
+
+</div>

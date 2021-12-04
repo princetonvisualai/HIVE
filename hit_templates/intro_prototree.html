@@ -1,0 +1,49 @@
+<div class='container-fluid'>
+  <h2>ProtoTree</h2>
+  <p>
+    The ProtoTree model reasons with <b>prototypes</b> which are typical representations of
+    a feature. For example, pink skinny long legs is a prototype for Flamingos.
+    <br>
+    <br>
+    The ProtoTree model makes decisions in steps following a tree structure.
+    Each step in the model contains a prototype learned from a previously seen photo.
+    At each step, the model compares a given photo to the step's prototype and rates their
+    similarity with a score between 0 and 1. If the similarity score is above 0.5,
+    the model judges that the prototype is <b>present</b> in the photo and <b>absent</b> otherwise.
+    The model then proceeds to the next step and repeats this process until it reaches the final step.
+    <br>
+    <br>
+    Below we show an example ProtoTree model.
+    For the given photo, the model produces a similarity score of 0.23 at Step 1.
+    Hence, the model judges that Step 1&#39;s prototype is <b>absent</b> in this photo,
+    and moves on to Step 2-a. At Step 2-a, the model produces a similarity score of 0.78 and
+    judges that Step 2-a&#39;s prototype is <b>present</b> in this photo.
+    The model predicts that the bird in the given photo is <b>Species 2</b>.
+    Note that the model never visits Step 2-b.
+  </p>
+</div>
+
+<div class='container-fluid'>
+  <div class='col-xs-8 '>
+    <img src="https://drive.google.com/uc?export=view&id=1BFfPMrm3pwn0-NUyZRNoZJXR2-onc8HY" width=100%>
+  </div>
+</div>
+
+<br><br>
+
+<div class='container-fluid'>
+  <div class='col-xs-12'>
+    <p>
+      Below is the full structure of the model.
+      At each step, we show the step&#39;s prototype (left) and the photo where the prototype is from (right).
+      If the display is too small, you can download the PDF from
+       <a href="https://drive.google.com/file/d/1iuKCkhVCtZetUZAlNH1K3k4Um499sFew" target="_blank">
+         <button onclick=pg_global()>
+         this google drive link
+         </button>
+       </a>.
+    </p>
+    <br>
+    <embed src="https://drive.google.com/file/d/1iuKCkhVCtZetUZAlNH1K3k4Um499sFew/preview" type="application/pdf" width="100%" height="50%">
+  </div>
+</div>

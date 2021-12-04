@@ -1,0 +1,1221 @@
+<html>
+  <head>
+    <title>Evaluating interpretability</title>
+    <!-- simpleamt depends on these libraries -->
+    <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js'></script>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/json3/3.3.2/json3.min.js'></script>
+    <!-- end of required libraries -->
+    <script src='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js'></script>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js'></script>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- mozilla pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.0.943/pdf.min.js"></script>
+    <style>
+      #text-area {
+        margin: 10px 0;
+        font-size: 24pt;
+      }
+      #button-div {
+        margin-bottom: 10px;
+      }
+      #feedback-area {
+        margin: 10px 0;
+        font-size: 24pt;
+      }
+      #counter {
+        margin: 0 10px;
+        font-size: 20pt;
+        font-weight: bold;
+      }
+      #slider-low {
+        width: 100%;
+        margin: 2em auto;
+      }
+      #slider-low label {
+        position: absolute;
+        width: 20px;
+        margin-top: 20px;
+        margin-left: -10px;
+        text-align: center;
+      }
+      #slider-med {
+        width: 100%;
+        margin: 2em auto;
+      }
+      #slider-med label {
+        position: absolute;
+        width: 20px;
+        margin-top: 20px;
+        margin-left: -10px;
+        text-align: center;
+      }
+      #slider-high {
+        width: 100%;
+        margin: 2em auto;
+      }
+      #slider-high label {
+        position: absolute;
+        width: 20px;
+        margin-top: 20px;
+        margin-left: -10px;
+        text-align: center;
+      }
+      p {
+        font-size: 18px;
+      }
+      .btn-group button {
+        background-color: #3e3d3d; /* Green background */
+        border: 1px solid rgb(0, 0, 0); /* Green border */
+        color: white; /* White text */
+        padding: 10px 24px; /* Some padding */
+        cursor: pointer; /* Pointer/hand icon */
+        width: 50%; /* Set a width if needed */
+        display: block; /* Make the buttons appear below each other */
+      }
+      table, th, td {
+        border: none;
+        width=100%;
+        white-space:nowrap;
+        table-layout: auto;
+        padding: 10px;
+      }
+      table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        padding: 20px;
+      }
+
+      p, ul, ol, dl, table {
+        margin-bottom: 1em;
+        padding: 20px;
+        margin: 0px;
+        padding: 0px;
+        border: 0px;
+        font-size: 100%;
+        font: inherit;
+        vertical-align: baseline;
+      }
+      .right {
+        transform: rotate(-45deg);
+        -webkit-transform: rotate(-45deg);
+      }
+      .left {
+        transform: rotate(135deg);
+        -webkit-transform: rotate(135deg);
+      }
+      .up {
+        transform: rotate(-135deg);
+        -webkit-transform: rotate(-135deg);
+      }
+      .down {
+        transform: rotate(45deg);
+        -webkit-transform: rotate(45deg);
+      }
+      img {
+        height: auto;
+        width: 100%;
+      }
+      iframe {
+        width: 100%;
+        height: 50%;
+      }
+      hr {
+        display: block;
+        height: 1px;
+        border: 0;
+        border-top: 1px solid #ccc;
+        margin: 1em 0;
+        padding: 0;
+      }
+      li {
+        font-size: 18px;
+      }
+      .row_special {
+        display: grid;
+        grid-auto-flow: column;
+        gap: 10%;
+      }
+
+      .col_special {
+        display: grid;
+        grid-auto-flow: row;
+        align-items: center;
+      }
+      .double {
+        zoom: 1.5;
+        transform: scale(2);
+        -ms-transform: scale(2);
+        -webkit-transform: scale(2);
+        -o-transform: scale(2);
+        -moz-transform: scale(2);
+        transform-origin: 0 0;
+        -ms-transform-origin: 0 0;
+        -webkit-transform-origin: 0 0;
+        -o-transform-origin: 0 0;
+        -moz-transform-origin: 0 0;
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <!-- Demographics and background -->
+    {% include "hit_templates/setup.html" %}
+
+    {% include "hit_templates/decision_tree.html" %}
+
+
+    <!-- Model introduction -->
+    <div class='container-fluid' id="part_intro" style="display: none; ">
+      <div class='container-fluid'>
+        <h1>Model introduction</h1>
+        <p style="font-size:18px">
+          We have a model that recognizes 200 bird species in photos.
+          We have access to its prediction and an explanation for it.
+          <br>
+          <b>Please carefully read this page as the remaining study depends on your understanding of the model.</b>
+        </p>
+        <br>
+        {% include "hit_templates/intro_prototree.html" %}
+        <br>
+        <div class='col-xs-12' id='button-div'>
+          <button class='btn btn-lg btn-primary' id="next_intro2preview" onclick="pg_intro2preview()">Next Page</button>
+        </div>
+        <br><br><br>
+      </div>
+    </div>
+
+    <!-- Task preview & Examples -->
+    <div class='container-fluid' id="part_preview" style="display: none; ">
+
+      <div class='container-fluid'>
+        <h1>Task preview</h1>
+        <p>Here is a preview of the task you will complete.</p>
+      </div>
+
+      <br>
+      <div class='container-fluid'>
+        <div class='col-xs-9' style="border:1px solid black;">
+
+          <div class='container-fluid'>
+            <h1>Examine model predictions</h1>
+            <p>
+              Given a bird photo, the ProtoTree model predicts the species based on prototypes it has learned from
+              previously seen photos.
+              Specifically for each prototype, the model identifies a region in the
+              photo that looks the most similar to the prototype and rates their similarity.
+            </p>
+            <p>
+              <b>
+                Judge whether you agree with the model's identified region by rating the region and prototype similar from on a scale of 1-4.
+                At the end, rate your confidence in the model's prediction.
+              </b>
+            </p>
+            <br>
+          </div>
+
+          <div class='container-fluid'>
+            <h3>Task: Rate the similarity of each row's prototype-region pair on a scale of 1-4.
+              <br>
+              (1: Not Similar, 2: Somewhat Not Similar, 3: Somewhat Similar, 4: Similar)
+            </h3>
+            <br>
+            <div class='col-xs-2'>
+              <img src="https://drive.google.com/uc?export=view&id=1lna-1d18c5DT3RhLfiCk5E5MvJlvARg2" width=100%>
+              <br>
+              <p>Model predicts <b>Species 17</b></p>
+            </div>
+            <!-- End of photo -->
+
+            <div class='col-xs-10'>
+              <div class='container-fluid'>
+                <div class='col-xs-11'>
+                  <div class='row_special'>
+                    <!-- Column 1 -->
+                    <div class='col_special'>
+                      <img src="https://drive.google.com/uc?export=view&id=1qdiheMVIaEcx8wYwe22lEQUI3diLOnbr" width=100%>
+                    </div>
+
+                    <!-- Column 2 -->
+                    <div id='checkboxes_distinction_taskpreview' class='col_special'>
+                      <div id="row1_taskpreview" class="double">
+                        <input type="radio" checked name="similarity1_taskpreview" value="1" style="vertical-align:top">1
+                        <input type="radio" name="similarity1_taskpreview" value="2" style="vertical-align:top">2
+                        <input type="radio" name="similarity1_taskpreview" value="3" style="vertical-align:top">3
+                        <input type="radio" name="similarity1_taskpreview" value="4" style="vertical-align:top">4
+                        <!-- <span style="margin-left:5px; font-size:10px">Row 1</span> -->
+                      </div>
+                      <div id="row2_taskpreview" class="double">
+                       <input type="radio" name="similarity2_taskpreview" value="1" style="vertical-align:top">1
+                        <input type="radio" name="similarity2_taskpreview" value="2" style="vertical-align:top">2
+                        <input type="radio" name="similarity2_taskpreview" value="3" style="vertical-align:top">3
+                        <input type="radio" checked name="similarity2_taskpreview" value="4" style="vertical-align:top">4
+                      </div>
+                      <div id="row3_taskpreview" class="double">
+                       <input type="radio" checked name="similarity3_taskpreview" value="1" style="vertical-align:top">1
+                        <input type="radio" name="similarity3_taskpreview" value="2" style="vertical-align:top">2
+                        <input type="radio" name="similarity3_taskpreview" value="3" style="vertical-align:top">3
+                        <input type="radio" name="similarity3_taskpreview" value="4" style="vertical-align:top">4
+                      </div>
+                      <div id="row4_taskpreview" class="double">
+                       <input type="radio" name="similarity4_taskpreview" value="1" style="vertical-align:top">1
+                        <input type="radio" name="similarity4_taskpreview" value="2" style="vertical-align:top">2
+                        <input type="radio" checked name="similarity4_taskpreview" value="3" style="vertical-align:top">3
+                        <input type="radio" name="similarity4_taskpreview" value="4" style="vertical-align:top">4
+                      </div>
+                      <div id="row5_taskpreview" class="double">
+                       <input type="radio" name="similarity5_taskpreview" value="1" style="vertical-align:top">1
+                        <input type="radio" name="similarity5_taskpreview" value="2" style="vertical-align:top">2
+                        <input type="radio" name="similarity5_taskpreview" value="3" style="vertical-align:top">3
+                        <input type="radio" checked name="similarity5_taskpreview" value="4" style="vertical-align:top">4
+                      </div>
+                      <div id="row6_taskpreview" class="double">
+                       <input type="radio" name="similarity6_taskpreview" value="1" style="vertical-align:top">1
+                        <input type="radio" checked name="similarity6_taskpreview" value="2" style="vertical-align:top">2
+                        <input type="radio" name="similarity6_taskpreview" value="3" style="vertical-align:top">3
+                        <input type="radio" name="similarity6_taskpreview" value="4" style="vertical-align:top">4
+                      </div>
+                      <div id="row7_taskpreview" class="double">
+                       <input type="radio" name="similarity7_taskpreview" value="1" style="vertical-align:top">1
+                        <input type="radio" name="similarity7_taskpreview" value="2" style="vertical-align:top">2
+                        <input type="radio" name="similarity7_taskpreview" value="3" style="vertical-align:top">3
+                        <input type="radio" checked name="similarity7_taskpreview" value="4" style="vertical-align:top">4
+                      </div>
+                      <div id="row8_taskpreview" class="double">
+                       <input type="radio" name="similarity8_taskpreview" value="1" style="vertical-align:top">1
+                        <input type="radio" name="similarity8_taskpreview" value="2" style="vertical-align:top">2
+                        <input type="radio" name="similarity8_taskpreview" value="3" style="vertical-align:top">3
+                        <input type="radio" checked name="similarity8_taskpreview" value="4" style="vertical-align:top">4
+                      </div>
+                      <div id="row9_taskpreview" class="double">
+                       <input type="radio" name="similarity9_taskpreview" value="1" style="vertical-align:top">1
+                        <input type="radio" name="similarity9_taskpreview" value="2" style="vertical-align:top">2
+                        <input type="radio" name="similarity9_taskpreview" value="3" style="vertical-align:top">3
+                        <input type="radio" checked name="similarity9_taskpreview" value="4" style="vertical-align:top">4
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- End of row selection -->
+          </div>
+          <!-- End of task section -->
+
+          <br>
+
+          <div class='container-fluid'>
+            <h3>Q. What do you think about the model&#39;s prediction?</h3>
+            <form action="" method="post">
+              <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence_taskpreview" value="4"/>
+              <span style="font-size:18px">Fairly confident that prediction is <i>correct</i></span>
+              <br>
+              <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence_taskpreview" value="3"/>
+              <span style="font-size:18px">Somewhat confident that prediction is <i>correct</i></span>
+              <br>
+              <input type="radio" checked style="height:18px; width:18px; vertical-align:top;" name="confidence_taskpreview" value="2"/>
+              <span style="font-size:18px">Somewhat confident that prediction is <u>incorrect</u></span>
+              <br>
+              <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence_taskpreview" value="1"/>
+              <span style="font-size:18px">Fairly confident that prediction is <u>incorrect</u></span>
+            </form>
+          </div>
+        </div>
+      </div>
+
+
+    <br><br>
+
+    <!-- Example explanations -->
+    <div class='container-fluid'>
+      <h1>Example explanations</h1>
+      <p>
+        Below we show examples of a correct prediction and an incorrect prediction.
+        Please examine them and rate your level of understanding of the model.
+      </p>
+    </div>
+    <div class='container-fluid'>
+      <div class='col-xs-4'>
+        <h3>Correct prediction</h3>
+        <div id='correct1-container'></div>
+      </div>
+      <div class='col-xs-1'></div>
+      <div class='col-xs-4'>
+        <h3>Incorrect prediction</h3>
+        <div id='incorrect-container'></div>
+      </div>
+    </div>
+
+    <br>
+    <br>
+
+    <div class='container-fluid'>
+      <h3>Q. How well do you think you understand the model's reasoning process?</h3>
+      <form action="" method="post">
+        <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective" value="1" /> <span style="font-size:18px">Very Poor</span>
+        <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective" value="2" /> <span style="font-size:18px">Poor</span>
+        <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective" value="3" /> <span style="font-size:18px">Fair</span>
+        <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective" value="4" /> <span style="font-size:18px">Good</span>
+        <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective" value="5" /> <span style="font-size:18px">Very Good</span>
+      </form>
+    </div>
+
+    <br><br><br>
+
+    <div class='col-xs-12' id='button-div'>
+      <button class='btn btn-lg btn-primary' id="next_preview2task" disabled onclick="pg_preview2task()">Next Page</button>
+      <br><br>
+    </div>
+
+    <br><br>
+
+    </div> <!-- End of part_preview -->
+
+    <!-- Main task -->
+    {% include "hit_templates/task_prototree_agreement.html" %}
+
+
+    <!-- Post-task evaluation -->
+    <div class='container-fluid' id='part_post' style="display: none;">
+      <div class='container-fluid'>
+        <h1>Post-task evaluation</h1>
+        <br>
+        <h3>Q. How well do you think you understand the model's reasoning process?</h3>
+        <form action="" method="post">
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective2" value="1" /> <span style="font-size:18px">Very Poor</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective2" value="2" /> <span style="font-size:18px">Poor</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective2" value="3" /> <span style="font-size:18px">Fair</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective2" value="4" /> <span style="font-size:18px">Good</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective2" value="5" /> <span style="font-size:18px">Very Good</span>
+        </form>
+      </div>
+      <br><br><br>
+      <div class='col-xs-12' id='button-div'>
+        <button class='btn btn-lg btn-primary' id="next_post2perf"  onclick="pg_post2perf()">Next Page</button>
+      </div>
+    </div>
+
+    <!-- Your performance -->
+    <div class='container-fluid' id='part_perf' style="display: none;">
+      <div class='container-fluid'>
+        <h1>Your performance</h1>
+        <br>
+        <p>
+          In the previous task, 5 of 10 photos were correct predictions and the remaining 5 were incorrect predictions.
+          <br>
+          <br>
+          If we assign the 5 predictions with your highest &#34;confident that
+          prediction is correct&#34; rating to correct and the rest as incorrect,
+          <b>
+            you identified <span id="correctcount"></span> out of <span id="correcttotal"></span>
+            correct predictions and <span id="wrongcount"></span> out of <span id="wrongtotal"></span>
+            incorrect predictions.
+          </b>
+          <br>
+          <br>
+          Here are the individual answers you selected.
+          <br>
+          <br>
+          <b>For the 5 correct predictions, you responded:</b>
+          <br>
+          1. <span id="c11"></span><br>
+          2. <span id="c12"></span><br>
+          3. <span id="c13"></span><br>
+          4. <span id="c14"></span><br>
+          5. <span id="c15"></span><br>
+          <br>
+          <b>For the 5 incorrect predictions, you responded:</b>
+          <br>
+          1. <span id="inc11"></span><br>
+          2. <span id="inc12"></span><br>
+          3. <span id="inc13"></span><br>
+          4. <span id="inc14"></span><br>
+          5. <span id="inc15"></span><br>
+
+        </p>
+        <br>
+        <h3>Q. How well do you think you understand the model's reasoning process?</h3>
+        <form action="" method="post">
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective3" value="1" /> <span style="font-size:18px">Very Poor</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective3" value="2" /> <span style="font-size:18px">Poor</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective3" value="3" /> <span style="font-size:18px">Fair</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective3" value="4" /> <span style="font-size:18px">Good</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective3" value="5" /> <span style="font-size:18px">Very Good</span>
+        </form>
+      </div>
+      <br><br><br>
+      <div class='col-xs-12' id='button-div'>
+        <button class='btn btn-lg btn-primary' id="next_perf2choice"  onclick="pg_perf2choice()">Next Page</button>
+      </div>
+    </div>
+
+    <!-- Choose which model to use -->
+    {% include "hit_templates/choice_prototree_agreement.html" %}
+
+    <!-- Feedback -->
+    <div class='container-fluid' id='part_feedback' style="display: none;">
+      <div class='col-xs-12'>
+        <h3>
+          Thank you for your participation!
+          <br><br>
+          Let us know if you have any feedback about this study.
+        </h3>
+        <textarea id='feedback-area' name='feedback-area' class='form-control tb-margin'></textarea>
+      </div>
+
+      <!-- Submit -->
+      {% include "hit_templates/simpleamt.html" %}
+    </div>
+
+
+    <!-- For slider -->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
+
+    <script>
+      $('#consent-pdf').empty();
+      $('<embed>').attr(
+        {'src':'https://drive.google.com/file/d/1Gsqa86_NQXtySCo9Qxe8sOAPA-EOTy7P/preview', 'type':'application/pdf', 'width':'100%', 'height':'70%'}
+      ).appendTo($('#consent-pdf'));
+
+      $( function() {
+        // Low-risk
+        $( "#slider-low" ).slider({
+            value: 80, min: 70, max: 100, step: 1,
+            slide: function (e, ui) {
+                document.getElementById("low_risk").innerHTML = $('#slider-low').slider("option", "value");
+            },
+            stop: function (e, ui) {
+                document.getElementById("low_risk").innerHTML = $('#slider-low').slider("option", "value");
+            }
+        })
+        .each(function() {
+          var opt = $('#slider-low').data().uiSlider.options;
+          var vals = opt.max - opt.min;
+          for (var i = 0; i <= vals; i++) {
+            var el = $('<label>'+(opt.min+i)+'</label>').css('left',(i/vals*100)+'%');
+            $("#slider-low").append(el);
+          }
+        });
+        document.getElementById("low_risk").innerHTML = $('#slider-low').slider("option", "value");
+
+        // Med-risk
+        $( "#slider-med" ).slider({
+            value: 80, min: 70, max: 100, step: 1,
+            slide: function (e, ui) {
+                document.getElementById("med_risk").innerHTML = $('#slider-med').slider("option", "value");
+            },
+            stop: function (e, ui) {
+                document.getElementById("med_risk").innerHTML = $('#slider-med').slider("option", "value");
+            }
+        })
+        .each(function() {
+          var opt = $('#slider-med').data().uiSlider.options;
+          var vals = opt.max - opt.min;
+          for (var i = 0; i <= vals; i++) {
+            var el = $('<label>'+(opt.min+i)+'</label>').css('left',(i/vals*100)+'%');
+            $("#slider-med").append(el);
+          }
+        });
+        document.getElementById("med_risk").innerHTML = $('#slider-med').slider("option", "value");
+
+        // High-risk
+        $( "#slider-high" ).slider({
+            value: 80, min: 70, max: 100, step: 1,
+            slide: function (e, ui) {
+                document.getElementById("high_risk").innerHTML = $('#slider-high').slider("option", "value");
+            },
+            stop: function (e, ui) {
+                document.getElementById("high_risk").innerHTML = $('#slider-high').slider("option", "value");
+            }
+        })
+        .each(function() {
+          var opt = $('#slider-high').data().uiSlider.options;
+          var vals = opt.max - opt.min;
+          for (var i = 0; i <= vals; i++) {
+            var el = $('<label>'+(opt.min+i)+'</label>').css('left',(i/vals*100)+'%');
+            $("#slider-high").append(el);
+          }
+        });
+        document.getElementById("high_risk").innerHTML = $('#slider-high').slider("option", "value");
+      });
+
+    </script>
+
+
+
+    <script>
+      function movepage(div_prev, div_next) {
+        if (div_prev.style.display !== 'none') {
+          div_prev.style.display = 'none';
+          div_next.style.display = 'block';
+        }
+        else {
+          div_prev.style.display = 'block';
+          div_next.style.display = 'none';
+        }
+        // Jump to the top of the page
+        window.scroll({
+          top: 0,
+          left: 0,
+          behavior: 'smooth'
+        });
+      }
+
+      // Create timing object
+      timing = {};
+      timing['start'] = Date.now();
+      timing['pg_method'] = [];
+      timing['nextphoto'] = [];
+      timing['pg_global'] = [];
+
+      // Move between pages
+      function pg_consent2demographics() {
+        timing['pg_consent2demographics'] = Date.now();
+        var div_prev = document.getElementById('part_consent');
+        var div_next = document.getElementById('part_demographics');
+        movepage(div_prev, div_next);
+      }
+      function pg_demographics2intro() {
+        timing['pg_demographics2intro'] = Date.now();
+        var div_prev = document.getElementById('part_demographics');
+        var div_next = document.getElementById('part_decisiontree');
+        movepage(div_prev, div_next);
+      }
+
+      function pg_dt2intro() {
+        timing['pg_dt2intro'] = Date.now();
+        var div_prev = document.getElementById('part_decisiontree');
+        var div_next = document.getElementById('part_intro');
+        movepage(div_prev, div_next);
+      }
+
+      function pg_intro2preview() {
+        timing['pg_intro2preview'] = Date.now();
+        var div_prev = document.getElementById('part_intro');
+        var div_next = document.getElementById('part_preview');
+        movepage(div_prev, div_next);
+      }
+      function pg_preview2task() {
+        timing['pg_preview2task'] = Date.now();
+        var div_prev = document.getElementById('part_preview');
+        var div_next = document.getElementById('part_task');
+        movepage(div_prev, div_next);
+      }
+      function pg_task2post() {
+        timing['pg_task2post'] = Date.now();
+        var div_prev = document.getElementById('part_task');
+        var div_next = document.getElementById('part_post');
+        movepage(div_prev, div_next);
+      }
+      function pg_post2perf() {
+        timing['pg_post2perf'] = Date.now();
+        var div_prev = document.getElementById('part_post');
+        var div_next = document.getElementById('part_perf');
+        movepage(div_prev, div_next);
+      }
+      function pg_perf2choice() {
+        timing['pg_perf2choice'] = Date.now();
+        var div_prev = document.getElementById('part_perf');
+        var div_next = document.getElementById('part_choice');
+        movepage(div_prev, div_next);
+      }
+      function pg_choice2feedback() {
+        timing['pg_choice2feedback'] = Date.now();
+        var div_prev = document.getElementById('part_choice');
+        var div_next = document.getElementById('part_feedback');
+        movepage(div_prev, div_next);
+      }
+      function pg_method() {
+        timing['pg_method'][timing['pg_method'].length] = Date.now();
+        var div_method = document.getElementById('part_method');
+        if (div_method.style.display == 'none') {
+          div_method.style.display = 'block';
+        }
+        else {
+          div_method.style.display = 'none';
+        }
+      }
+      function pg_global() {
+        timing['pg_global'][timing['pg_global'].length] = Date.now();
+      }
+
+      function add(accumulator, a) {
+        return accumulator + a;
+      }
+
+      function median(values){
+        values.sort(function(a,b){
+          return a-b;
+        });
+        var half = Math.floor(values.length / 2);
+        if (values.length % 2)
+          return values[half];
+        else
+          return (values[half - 1] + values[half]) / 2.0;
+      };
+
+      var confidence_to_words = {'4': "Fairly confident that prediction is <i>correct</i>",
+      '3': "Somewhat confident that prediction is <i>correct</i>",
+      '2': "Somewhat confident that prediction is <u>incorrect</u>",
+      '1': "Fairly confident that prediction is <u>incorrect</u>"}
+
+      var DEFAULT_INPUT = {"input_id": [0],
+      "correct": ["https://drive.google.com/uc?export=view&id=1IfSdyotkLsjP6c36dQnLqLuGwzl5_oUn"],
+      "incorrect": ["https://drive.google.com/uc?export=view&id=1NK0pSepwzWJyzptQEQwLQ3s0Z_0c_7eY"],
+      "input_image": ["https://drive.google.com/uc?export=view&id=13PhRtLOEeo4aUasxcVqXGDySyGx5IVTV",
+      "https://drive.google.com/uc?export=view&id=1nNpJOrpBa5O9NtsAt0Rbs07FDa4Hpqy4",
+      "https://drive.google.com/uc?export=view&id=15026ycm4n7IgK3mFCxmR8OKzPUQ9uy43",
+      "https://drive.google.com/uc?export=view&id=1oYXj6TuU4xfZ6rkc9p4z03FhkPptVBxl",
+      "https://drive.google.com/uc?export=view&id=1mnXcHgHa5DjVfSLz_CGy86L5WF_QHDS_",
+      "https://drive.google.com/uc?export=view&id=1Zlc4wJqXo9xJGYIFWMe09EoRiy1SPHtq",
+      "https://drive.google.com/uc?export=view&id=164VcjjGdI7kDuheDL6jrV3N8vHLWs3Zr",
+      "https://drive.google.com/uc?export=view&id=15Atw4rrTgtUTz6XWv10-n6dVjve8s-d3",
+      "https://drive.google.com/uc?export=view&id=1qyId3zH0JlkHIGqhD4BVExaFAQcfNd-2",
+      "https://drive.google.com/uc?export=view&id=1dwtzOhIZg3wRa9lwxBiqQazJM6QKpx3X"],
+       "input_explanation": ["https://drive.google.com/uc?export=view&id=1PJObVPzEXym-HYk25Bbsmcke4Qzwt4cO",
+       "https://drive.google.com/uc?export=view&id=1dtPsRYs10maQ-lnoFYWDVXde2ClEfi8N",
+       "https://drive.google.com/uc?export=view&id=1e0xf2FZvkdw-nZZqhRkCl_WRzNwuDeZF",
+       "https://drive.google.com/uc?export=view&id=1D8_9T5uvLwiT-QjfpO0OOplADZ0I577h",
+       "https://drive.google.com/uc?export=view&id=1QVTPV43tCBESFJAWbUgUAw2jVKYlbF4D",
+       "https://drive.google.com/uc?export=view&id=11CbYmJBug0X2aWcGX3Z3ji3gLBRrhn1Y",
+       "https://drive.google.com/uc?export=view&id=1MuX6vCMjCpioLxhERu-eu7z4BD9USdKY",
+       "https://drive.google.com/uc?export=view&id=14qgFw0CXdwBM5qK3xGbbfSX75QGevpjJ",
+       "https://drive.google.com/uc?export=view&id=1gifErEcby_toYITEmBSefVzK0eRg99Yn",
+       "https://drive.google.com/uc?export=view&id=1pofmES9IoBhwiPE4N6X7bXwq5MidZQi0"],
+       "input_prediction": [143, 9, 148, 73, 100, 138, 157, 169, 106, 149],
+       "ground_truth": ["Incorrect", "Incorrect", "Incorrect", "Incorrect", "Correct",
+       "Correct", "Incorrect", "Correct", "Correct", "Correct"],
+       "probs": [[0.024043835699558258, 0.002032760763540864, 0.996101438999176, 0.00973576121032238, 0.04471117630600929, 0.004848727025091648, 0.9897182583808899, 0.03629108890891075, 0.9890122413635254],
+         [0.005474478472024202, 0.0009706469718366861, 0.00819904450327158, 0.996101438999176, 0.019169343635439873, 0.015233708545565605, 0.9904773235321045, 0.02387373149394989, 0.9932569861412048],
+         [0.00222613662481308, 0.0005890936008654535, 0.1062280610203743, 0.9913033843040466, 0.015511399134993553, 0.011813702993094921, 0.016112031415104866, 0.02460971288383007, 0.017145883291959763],
+         [0.0022785214241594076, 0.004477775190025568, 0.5878021717071533, 0.6832910776138306, 0.005341726820915937, 0.8960198760032654, 0.13925166428089142, 0.005187797360122204, 0.031107617542147636],
+         [0.996101438999176, 0.004392735660076141, 0.0007576204952783883, 0.00771939055994153, 0.9999998807907104, 0.006737689953297377, 0.02220696210861206, 0.038216982036828995, 0.9932569861412048],
+         [0.996101438999176, 0.9944909811019897, 0.0003807450120802969, 0.00031383096938952804, 0.00038775516441091895, 0.0003568204992916435, 0.00681026978418231, 0.03401891887187958, 0.9806582927703857],
+         [0.0025610607117414474, 0.8975269794464111, 0.996101438999176, 0.04232921451330185, 0.001532814116217196, 0.005035686772316694, 0.996101438999176, 0.33288392424583435, 0.07497035712003708],
+         [0.004017329309135675, 0.00424381485208869, 0.005548314657062292, 0.0076237875036895275, 0.9932569861412048, 0.996101438999176, 0.9922178983688354, 0.009277374483644962, 0.042855337262153625],
+         [0.0022412878461182117, 0.002596159465610981, 0.003415534272789955, 0.9932569861412048, 0.01270921528339386, 0.996101438999176, 0.004920280538499355, 0.9883496761322021, 0.05089269205927849],
+         [0.0018605788936838508, 0.0070251040160655975, 0.010732920840382576, 0.0020039700902998447, 0.044957857578992844, 0.01429520919919014, 0.996101438999176, 0.004755788017064333, 0.9944909811019897]],
+        "firstwrong": [2, 4, 6, 8, 10, 10, 9, 10, 10, 10]
+      };
+
+      // Variables to record answers
+      var answers = [];
+      var descriptions = [];
+      var feedback = [];
+
+      // Some variables to track state of the HIT.
+      var enabled = false;
+      var longinput = null;
+
+      var localanswers = [];
+      var idx = 0;
+
+      var correctacclist = [];
+      var wrongacclist = [];
+      var correcttotal = [];
+      var wrongtotal = [];
+
+      var checked_radiobtns = new Array(10).fill(0);
+
+      var origacc = 79.9;
+      document.getElementById("origacc").innerHTML = origacc;
+      document.getElementById("origacc_copy1").innerHTML = origacc;
+      document.getElementById("origacc_copy2").innerHTML = origacc;
+      document.getElementById("origacc_copy3").innerHTML = origacc;
+
+
+      function record() {
+        checked_radiobtns= new Array(10).fill(0);
+
+        timing['nextphoto'][idx] = Date.now();
+
+        var selected = [];
+        $('#checkboxes_distinction input:checked').each(function() {
+            selected.push($(this).attr('value'));
+        });
+
+        console.log("selected: "+selected);
+        localanswers[idx] = {
+          'confidence': parseInt($('input[name=confidence]:checked').val(), 10),
+          'selected': selected,
+        };
+
+        // Reset the checkboxes
+        $('#checkboxes_distinction input:checked').each(function() {
+          $(this).prop( "checked", false );
+        });
+
+        // Calculate accuracy
+        correctacclist = [];
+        wrongacclist = [];
+        correcttotal = [];
+        wrongtotal = [];
+
+        if (idx == 9) {
+          // localanswers is currently confidence ratings. Must convert to "correct"/"incorrect"
+          // calculate the median of the ratings
+          localanswers_confidence = [];
+          for (var i = 0; i < localanswers.length; ++i) {
+            localanswers_confidence.push(localanswers[i]['confidence'])
+          };
+
+          console.log("localanswers_confidence: "+localanswers_confidence);
+          localanswers_deepcopy = JSON.parse(JSON.stringify(localanswers_confidence));
+          var median_la = median(localanswers_deepcopy);
+
+          var incor_count = 0;
+          var cor_count = 0;
+          localanswers_new = Array(10);
+          for (var i = 0; i < input_image.length; ++i) {
+            if (localanswers[i]['confidence'] > median_la) {
+              // for all nums greater than median: "Correct"
+              localanswers_new[i] = 'Correct';
+              cor_count++;
+            }
+            // for all num less than median: "Incorrect"
+            if (localanswers[i]['confidence'] < median_la) {
+              localanswers_new[i] = 'Incorrect';
+              incor_count++;
+            }
+            if (localanswers[i]['confidence'] == median_la) {
+              localanswers_new[i] = 'TBD';
+            }
+          };
+
+          console.log("localanswers_new1: "+localanswers_new);
+
+          num_to_label_incor = 5-incor_count;
+          num_to_label_cor = 5-cor_count;
+          if (num_to_label_incor > 5) {num_to_label_incor=5;};
+          if (num_to_label_cor > 5) {num_to_label_cor=5;};
+
+          // in case the median doesn't split this into two even halves,
+          for (var i = 0; i < input_image.length; ++i) {
+            // label 5-num_incorrect as incorrect
+            // label 5-num_correct as correct
+
+            if (localanswers_new[i] === 'TBD') {
+              // Randomly choose correct (0) or incorrect (1)
+              var cor_incor_choice = Math.floor(Math.random() * 2);
+
+              if (cor_incor_choice==0) {
+                if (num_to_label_cor > 0) {
+                  localanswers_new[i] = 'Correct';
+                  num_to_label_cor--;
+                  cor_count++;
+                }
+                else {
+                  localanswers_new[i] = 'Incorrect';
+                  incor_count++;
+                  num_to_label_incor--;
+                }
+              }
+              else {
+                if (num_to_label_incor > 0) {
+                  localanswers_new[i] = 'Incorrect';
+                  incor_count++;
+                  num_to_label_incor--;
+                }
+                else {
+                  localanswers_new[i] = 'Correct';
+                  num_to_label_cor--;
+                  cor_count++;
+                }
+              }
+            }
+          };
+
+          // show the user their classifcations
+          var correct_counter = 1;
+          var incorrect_counter = 1;
+          for (var i = 0; i < input_image.length; ++i) {
+            if (ground_truth[i] == 'Correct') {
+              document.getElementById("c1"+String(correct_counter)).innerHTML = confidence_to_words[String(localanswers_confidence[i])];
+              // document.getElementById("c2"+String(correct_counter)).innerHTML = confidence_to_words[String(localanswers_confidence[i])];
+              correct_counter++;
+            }
+            else {
+              document.getElementById("inc1"+String(incorrect_counter)).innerHTML = confidence_to_words[String(localanswers_confidence[i])];
+              // document.getElementById("inc2"+String(incorrect_counter)).innerHTML = confidence_to_words[String(localanswers_confidence[i])];
+              incorrect_counter++;
+            }
+          }
+          console.log("localanswers_new2: "+localanswers_new);
+          for (var i = 0; i < input_image.length; ++i) {
+            if (ground_truth[i] == 'Correct') {
+              if (localanswers_new[i] == ground_truth[i]) {
+                correctacclist[i] = 1;
+              } else {
+                correctacclist[i] = 0;
+              }
+              correcttotal[i] = 1;
+            } else {
+              if (localanswers_new[i] == ground_truth[i]) {
+                wrongacclist[i] = 1;
+              } else {
+                wrongacclist[i] = 0;
+              }
+              wrongtotal[i] = 1;
+            }
+          }
+          console.log('correctacclist: '+correctacclist);
+          console.log('wrongacclist: '+wrongacclist);
+
+          var correctcount = correctacclist.reduce(function(a, b) { return Number(a) + Number(b); }, 0);
+          var wrongcount = wrongacclist.reduce(function(a, b) { return Number(a) + Number(b); }, 0);
+          var correcttotal = correcttotal.reduce(function(a, b) { return Number(a) + Number(b); }, 0);
+          var wrongtotal = wrongtotal.reduce(function(a, b) { return Number(a) + Number(b); }, 0);
+          var correctacc = correctcount / correcttotal;
+          var wrongacc = wrongcount / wrongtotal;
+          console.log("correctcount:" +correctcount);
+          console.log("wrongcount: "+ wrongcount);
+
+          document.getElementById("correctcount").innerHTML = correctcount;
+          document.getElementById("wrongcount").innerHTML = wrongcount;
+          document.getElementById("correcttotal").innerHTML = correcttotal;
+          document.getElementById("wrongtotal").innerHTML = wrongtotal;
+          document.getElementById("correctcount2").innerHTML = correctcount;
+          document.getElementById("wrongcount2").innerHTML = wrongcount;
+          document.getElementById("correcttotal2").innerHTML = correcttotal;
+          document.getElementById("wrongtotal2").innerHTML = wrongtotal;
+        }
+
+      }
+
+
+      $(function() {
+
+        $("input[name='consent']").change(function(){next_consent2demographics.disabled = false;});
+        $("input[name='ml_exp']").change(function(){next_demographics2intro.disabled = false;});
+        $("input[name='subjective']").change(function(){next_preview2task.disabled = false;});
+        $("input[name='subjective2']").change(function(){next_post2perf.disabled = false;});
+        $("input[name='subjective3']").change(function(){next_perf2choice.disabled = false;});
+
+        $("input[name='similarity1']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns[0] = 1;
+          if (($("input[name='confidence']").is(":checked")) && (checked_radiobtns.reduce(add, 0)==num_prototypes[idx])) {
+            if (idx != 9) {next_btn.disabled = false;}
+            if (idx == 9) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity2']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns[1] = 1;
+          if (($("input[name='confidence']").is(":checked")) && (checked_radiobtns.reduce(add, 0)==num_prototypes[idx])) {
+            if (idx != 9) {next_btn.disabled = false;}
+            if (idx == 9) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity3']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns[2] = 1;
+          if (($("input[name='confidence']").is(":checked")) && (checked_radiobtns.reduce(add, 0)==num_prototypes[idx])) {
+            if (idx != 9) {next_btn.disabled = false;}
+            if (idx == 9) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity4']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns[3] = 1;
+          if (($("input[name='confidence']").is(":checked")) && (checked_radiobtns.reduce(add, 0)==num_prototypes[idx])) {
+            if (idx != 9) {next_btn.disabled = false;}
+            if (idx == 9) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity5']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns[4] = 1;
+          if (($("input[name='confidence']").is(":checked")) && (checked_radiobtns.reduce(add, 0)==num_prototypes[idx])) {
+            if (idx != 9) {next_btn.disabled = false;}
+            if (idx == 9) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity6']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns[5] = 1;
+          if (($("input[name='confidence']").is(":checked")) && (checked_radiobtns.reduce(add, 0)==num_prototypes[idx])) {
+            if (idx != 9) {next_btn.disabled = false;}
+            if (idx == 9) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity7']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns[6] = 1;
+          if (($("input[name='confidence']").is(":checked")) && (checked_radiobtns.reduce(add, 0)==num_prototypes[idx])) {
+            if (idx != 9) {next_btn.disabled = false;}
+            if (idx == 9) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity8']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns[7] = 1;
+          if (($("input[name='confidence']").is(":checked")) && (checked_radiobtns.reduce(add, 0)==num_prototypes[idx])) {
+            if (idx != 9) {next_btn.disabled = false;}
+            if (idx == 9) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity9']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns[8] = 1;
+          if (($("input[name='confidence']").is(":checked")) && (checked_radiobtns.reduce(add, 0)==num_prototypes[idx])) {
+            if (idx != 9) {next_btn.disabled = false;}
+            if (idx == 9) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity10']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns[9] = 1;
+          if (($("input[name='confidence']").is(":checked")) && (checked_radiobtns.reduce(add, 0)==num_prototypes[idx])) {
+            if (idx != 9) {next_btn.disabled = false;}
+            if (idx == 9) {next_task2post.disabled = false;}
+          };
+        });
+
+        // $("input[name='confidence']").change(function(){
+        //   if (($("input[name='confidence']").is(":checked"))) {
+        //     if (idx != 9) {next_btn.disabled = false;}
+        //     if (idx == 9) {next_task2post.disabled = false;}
+        //  }
+        // });
+        $("input[name='confidence']").change(function(){
+          if (($("input[name='confidence']").is(":checked")) && (checked_radiobtns.reduce(add, 0)==num_prototypes[idx])) {
+            if (idx != 9) {next_btn.disabled = false;}
+            if (idx == 9) {next_task2post.disabled = false;}
+         }
+        });
+
+
+        function main() {
+          // If this is a HIT on AMT, then replace the default input with the real input.
+          longinput = simpleamt.getInput(DEFAULT_INPUT);
+
+          correct1 = longinput['correct']
+          incorrect = longinput['incorrect']
+          input_image = longinput['input_image']
+          input_prediction = longinput['input_prediction']
+          input_explanation = longinput['input_explanation']
+          ground_truth = longinput['ground_truth']
+          num_prototypes = [9, 9, 9, 9, 9, 9, 9, 9, 9, 9]
+          input_id = longinput['input_id'][0]
+
+          // Enable the UI if the HIT is not in preview mode.
+          if (!simpleamt.isPreview()) {
+            enable_hit();
+          }
+
+          // Set up the descriptions.
+          _.each(input, function() { descriptions.push(''); });
+          _.each(input, function() { feedback.push(''); });
+
+          // Preload all images
+          _.each(correct1, function(img_url) {
+            var img = new Image();
+            img.onload = function() { console.log('loaded image from ' + img_url); };
+            img.src = img_url;
+          });
+          _.each(incorrect, function(img_url) {
+            var img = new Image();
+            img.onload = function() { console.log('loaded image from ' + img_url); };
+            img.src = img_url;
+          });
+          _.each(input_image, function(img_url) {
+            var img = new Image();
+            img.onload = function() { console.log('loaded image from ' + img_url); };
+            img.src = img_url;
+          });
+          _.each(input_explanation, function(img_url) {
+            var img = new Image();
+            img.onload = function() { console.log('loaded image from ' + img_url); };
+            img.src = img_url;
+          });
+
+          render();
+        }
+
+        // Use the current index to update the image and description
+        function render() {
+
+          // Jump to the top of the page
+          window.scroll({
+            top: 0,
+            left: 0,
+            behavior: 'smooth'
+          });
+
+          for (let i = 1; i < 11; i++) {
+              id_text = 'row'+i;
+              document.getElementById(id_text).style.display = 'block';
+            };
+
+          if (num_prototypes[idx] < 10) {
+            for (let i = num_prototypes[idx] + 1; i < 11; i++) {
+              id_text = 'row'+i;
+              document.getElementById(id_text).style.display = 'none';
+            };
+          };
+
+          for (let i = 1; i < 11; i++) {
+            id_text = 'row'+i;
+            console.log("document.getElementById("+id_text+").style.display: "+document.getElementById(id_text).style.display);
+          };
+
+          // 1_intro: 2 correct, 1 incorrect
+          $('#correct1-container').empty(); $('<img>').attr('src', correct1[0]).appendTo($('#correct1-container'));
+          // $('#correct2-container').empty(); $('<img>').attr('src', correct2[0]).appendTo($('#correct2-container'));
+          $('#incorrect-container').empty(); $('<img>').attr('src', incorrect[0]).appendTo($('#incorrect-container'));
+
+          // 2_distinguish: Set up the image
+          $('#testimage-container').empty();
+          $('<img>').attr({
+            'src':input_image[idx], 'height':'20%', 'align':'center'
+          }).appendTo($('#testimage-container'));
+
+          // 2_distinguish: Set up the explanation
+          $('#pdf-container').empty(); $('<img>').attr('src', input_explanation[idx]).appendTo($('#pdf-container'));
+
+          // 2_distinguish: Set up the prediction
+          document.getElementById("Prediction").innerHTML = input_prediction[idx];
+
+          // 3_choose: Set up the text area
+          $('#text-area').val(descriptions);
+          $('#feedback-area').val(feedback);
+
+          // Refresh the counter
+          $('.counter-top').text(idx + 1);
+          $('.counter-bottom').text(input_image.length);
+
+        }
+
+        // Save the input and update the index
+        function set_idx(new_idx) {
+          if (new_idx < 0 || new_idx >= input_image.length) return;
+          idx = new_idx;
+          render();
+        }
+
+        // Enable the UI.
+        function enable_hit() {
+          enabled = true;
+
+          // Enable components
+          $('#next_btn').click(function() {
+            set_idx(idx + 1);
+            $('input[name=confidence]').prop('checked',false);
+            next_btn.disabled = true;
+          });
+
+          $('#text-area').prop('disabled', false);
+          $('#feedback-area').prop('disabled', false);
+          $('#submit-btn').prop('disabled', false);
+
+          // Set up submit handler.
+          simpleamt.setupSubmit();
+          $('#submit-btn').click(function() {
+
+            timing['submit'] = Date.now();
+
+            // Choice answers
+            ml_exp = $('input[name=ml_exp]:checked').val();
+            subjective = $('input[name=subjective]:checked').val();
+            subjective2 = $('input[name=subjective2]:checked').val();
+            subjective3 = $('input[name=subjective3]:checked').val();
+
+            // distinguish
+            correctcount = document.getElementById("correctcount").innerHTML;
+            wrongcount = document.getElementById("wrongcount").innerHTML;
+
+            // decision tree answers
+            dt1_prediction = []
+            dt1_prediction.push($('input[name="dtcorrect1"]:checked').val());
+            dt1_confidence = []
+            dt1_confidence.push($('input[name="confidence1"]:checked').val());
+            dt1_mistake = []
+            dt1_mistake.push($('input[name="mistake1"]:checked').val())
+
+            dt2_prediction = []
+            dt2_prediction.push($('input[name="dtcorrect2"]:checked').val());
+            dt2_confidence = []
+            dt2_confidence.push($('input[name="confidence2"]:checked').val());
+            dt2_mistake = []
+            dt2_mistake.push($('input[name="mistake2"]:checked').val());
+
+            // sliders
+            low_risk = [];
+            med_risk = [];
+            high_risk = [];
+            low_risk.push(document.getElementById("low_risk").innerHTML);
+            med_risk.push(document.getElementById("med_risk").innerHTML);
+            high_risk.push(document.getElementById("high_risk").innerHTML);
+
+            gender = [];
+            race = [];
+
+            if ($('input[name=gender]:checked').length > 0) {
+              gender.push($('input[name=gender]:checked').val());
+            }
+            else {
+              gender.push("");
+            };
+            if ($('input[name=race]:checked').length > 0) {
+              race.push($('input[name=race]:checked').val());
+            }
+            else {race.push("");};
+
+            if (gender.length === 0) {gender = [''];};
+            if (race.length === 0) {race = [''];};
+
+            gender_written = []
+            gender_written.push($('#genderdescribe').val());
+
+            // Descriptions of reasons
+            descriptions = []
+            descriptions.push($('#text-area').val());
+            feedback = []
+            feedback.push($('#feedback-area').val());
+
+            // Return output
+
+
+            var output = _.map(_.zip(ml_exp,
+              subjective, subjective2, subjective3,
+              correctcount, wrongcount,
+              low_risk, med_risk, high_risk,
+              descriptions, gender, gender_written, race, feedback,
+              dt1_prediction, dt1_confidence, dt1_mistake,
+              dt2_prediction, dt2_confidence, dt2_mistake), function(x) {
+              return {'ml_exp': x[0],
+              'subjective': x[1], 'subjective2': x[2], 'subjective3': x[3],
+              'correctcount': x[4], 'wrongcount': x[5],
+              'low_risk': x[6], 'med_risk':x[7], 'high_risk':x[8],
+              'descriptions': x[9],
+              'gender': x[10], 'gender_written': x[11],
+              'race': x[12], 'feedback': x[13],
+              'dt1_prediction':x[14], 'dt1_confidence':x[15], 'dt1_mistake':x[16],
+              'dt2_prediction':x[17], 'dt2_confidence':x[18], 'dt2_mistake':x[19],
+            };
+            });
+            // push the checked outputs in distinction task
+            // output.push({"input": longinput});
+            output.push({"input": input_id});
+            output.push({"individual_answers": localanswers});
+            output.push({'correctacclist': correctacclist});
+            output.push({'wrongacclist': wrongacclist});
+            output.push({"timing": timing});
+
+            simpleamt.setOutput(output);
+
+          });
+        }
+
+        main();
+
+      });
+
+
+    </script>
+  </body>
+</html>

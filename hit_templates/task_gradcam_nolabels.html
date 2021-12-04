@@ -1,0 +1,158 @@
+<div class='container-fluid' id='part_task' style="display: none; ">
+
+  <!-- Instructions -->
+  <div class='container-fluid'>
+    <h1>Examine model predictions</h1>
+    <p>
+      For each photo, we show explanations for the model's 4 predictions.
+      <br>
+      <br>
+      <b>
+        First, select the class you think the model predicts (i.e. gives the highest score).
+        Second, select the class you think is correct.
+        <br>
+        The two classes can be different because the model makes incorrect predictions on some photos.
+      </b>
+      <br>
+      <br>
+      For either question, random guessing will get you 25% accuracy.
+      You will receive a reward based on your performance beyond this 25% random chance.
+    </p>
+  </div>
+
+  <hr>
+
+  <!-- Display heatmaps -->
+  <div class='container-fluid'>
+    <div class='col-xs-12'>
+      <!-- <p style="font-size:24px">
+        This is a photo of <b><span id='label'></span></b>.
+      </p>
+      <br> -->
+      <div id='testimage-container'></div>
+    </div>
+  </div>
+
+  <div class='container-fluid'>
+    <div class='col-xs-6'>
+
+      <!-- Ask question -->
+      <div class='container-fluid'>
+        <h3>
+          Q. Which class do you think the model predicts?
+        </h3>
+        <form action="" method="post">
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="correct" value="0" /> <span style="font-size:18px">1 &nbsp;</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="correct" value="1" /> <span style="font-size:18px">2 &nbsp;</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="correct" value="2" /> <span style="font-size:18px">3 &nbsp;</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="correct" value="3" /> <span style="font-size:18px">4 &nbsp;</span>
+        </form>
+      </div>
+
+      <!-- Confidence -->
+      <div class='container-fluid'>
+        <h3>Q. How confident are you in your answer?</h3>
+        <form action="" method="post">
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence" value="1"/>
+          <span style="font-size:18px">Not confident at all &nbsp;</span>
+          <br>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence" value="2"/>
+          <span style="font-size:18px">Slightly confident &nbsp;</span>
+          <br>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence" value="3"/>
+          <span style="font-size:18px">Somewhat confident &nbsp;</span>
+          <br>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence" value="4"/>
+          <span style="font-size:18px">Fairly confident &nbsp;</span>
+          <br>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence" value="5"/>
+          <span style="font-size:18px">Completely confident &nbsp;</span>
+        </form>
+      </div>
+
+    </div>
+
+    <div class='col-xs-6'>
+
+      <!-- Ask question -->
+      <div class='container-fluid'>
+        <h3>
+          Q. Which class do you think is correct?
+        </h3>
+        <p></p>
+        <form action="" method="post">
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="correct2" value="0" /> <span style="font-size:18px">1 &nbsp;</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="correct2" value="1" /> <span style="font-size:18px">2 &nbsp;</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="correct2" value="2" /> <span style="font-size:18px">3 &nbsp;</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="correct2" value="3" /> <span style="font-size:18px">4 &nbsp;</span>
+        </form>
+      </div>
+
+      <!-- Confidence -->
+      <div class='container-fluid'>
+        <h3>Q. How confident are you in your answer?</h3>
+        <form action="" method="post">
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence2" value="1"/>
+          <span style="font-size:18px">Not confident at all &nbsp;</span>
+          <br>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence2" value="2"/>
+          <span style="font-size:18px">Slightly confident &nbsp;</span>
+          <br>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence2" value="3"/>
+          <span style="font-size:18px">Somewhat confident &nbsp;</span>
+          <br>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence2" value="4"/>
+          <span style="font-size:18px">Fairly confident &nbsp;</span>
+          <br>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence2" value="5"/>
+          <span style="font-size:18px">Completely confident &nbsp;</span>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- Next image -->
+  <div class='container-fluid'>
+    <h3>Click &#34;Next Photo&#34; after answering all questions.</h3>
+  </div>
+  <div class='container-fluid' id='button-div'>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id='counter'><span class='counter-top'></span> / <span class='counter-bottom'></span></span>
+    <br>
+    <button id='next_btn' style='background-color:#FFAC1C; border:none;' class='btn btn-lg btn-primary' onclick="record();" disabled>Next Photo</button>
+  </div>
+
+  <hr>
+
+  <!-- Next/Previous page -->
+  <div class='container-fluid'>
+    <h3>Click on &#34;Next Page&#34; after selecting answers for all 10 photos.</h3>
+  </div>
+  <br>
+  <div class='container-fluid' id='button-div'>
+    <button disabled class='btn btn-lg btn-primary' id='next_task2post' onclick="record();pg_task2post();">Next Page</button>
+  </div>
+
+  <hr>
+
+  <!--Method explanation-->
+  <div class='container-fluid'>
+    <h3>Click &#34;Method Description&#34; to open or close method description.</h3>
+  </div>
+  <div class='container-fluid' id='button-div'>
+    <button class='btn btn-lg btn-primary' style="background-color:#4CAF50; border:none;"
+    id='display_method' onclick="pg_method();">Method Description</button>
+  </div>
+  <div class='container-fluid' id="part_method" style="display: none; ">
+    <div class='col-xs-8' style="border:1px solid black;">
+      {% include "hit_templates/intro_gradcam.html" %}
+      <br><br>
+    </div>
+    <br><br>
+  </div>
+
+  <br><br>
+
+</div>

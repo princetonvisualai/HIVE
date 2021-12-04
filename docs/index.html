@@ -1,0 +1,289 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>HIVE: Evaluating the Human Interpretability of Visual Explanations</title>
+
+  <link href='https://fonts.googleapis.com/css?family=Overpass' rel='stylesheet'>
+  <link rel="stylesheet" href="font-awesome-4.7.0/css/font-awesome.min.css">
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+  <link href="mainpage.css" rel="stylesheet">
+</head>
+
+<body>
+
+
+
+<!-- Lab logo -->
+<!--<div class="row" style="text-align:center;padding:0;margin:0;padding-top:40;padding-bottom:10">-->
+<div class="row" style="text-align:center;padding:0;padding-top:20;padding-bottom:10;margin:0">
+  <div class="container">
+    <img src="imgs/princetonlogo.png" height="40px" style="vertical-align:middle">
+    <span style="font-size:32px;vertical-align:middle"><a href="https://visualai.princeton.edu" style="color:#ff8f00" target="_blank">Princeton Visual AI Lab</a></span>
+  </div>
+</div>
+  
+<!-- Authors -->
+<div class="container-fluid">
+  <div class="row">
+    <h1><span style="font-size:40px;color:#333;font-weight:800">HIVE: Evaluating the Human Interpretability of Visual Explanations</span></h1>
+    <div class="authors">
+      <span style="font-size:18px"><a href="https://www.cs.princeton.edu/~suhk/" style="color:#1075bc" target="new">Sunnie S. Y. Kim</a></span>
+      &nbsp;
+      <span style="font-size:18px"><a href="https://nicolemeister.github.io/" style="color:#1075bc" target="new">Nicole Meister</a></span>
+      &nbsp;
+      <span style="font-size:18px"><a href="https://www.cs.princeton.edu/~vr23/" style="color:#1075bc" target="new">Vikram V. Ramaswamy</a></span>
+      &nbsp;
+      <span style="font-size:18px"><a href="https://ruthcfong.github.io/" style="color:#1075bc" target="new">Ruth Fong</a></span>
+      &nbsp;
+      <span style="font-size:18px"><a href="https://www.cs.princeton.edu/~olgarus/" style="color:#1075bc" target="new">Olga Russakovsky</a></span>
+      <br>
+      <span style="font-size:18px">Princeton University</span>
+      <br>
+      <span style="font-size:18px">{sunniesuhyoung, nmeister, vr23, ruthfong, olgarus}@princeton.edu<br><br></span>
+    </div>
+  </div>
+</div>
+
+<!-- Figure 1 -->
+<div class="row" style="text-align:center;padding:0;margin:0">
+  <div class="container">
+    <figure>
+     <img src="imgs/fig1.png" style="width:60%">
+      <br />
+      <br />
+      <figcaption>
+        Our proposed <i>agreement</i> (top) and <i>distinction</i> (bottom) tasks for evaluating the human interpretability of visual explanations.
+      </figcaption>
+    </figure>
+    
+  </div>
+</div>
+
+&nbsp;
+
+<!-- Icons -->
+<div class="container">
+  <div class="row">
+    <div class="col-lg-0 col-md-0 col-sm-0"></div>
+          
+    <div class="col-xs-2 col-xs-offset-4 text-center">
+      <div class="service-box mt-5 mx-auto">
+        <a href="https://arxiv.org/abs/2112.XXXXX" target="_blank">
+          <i class="fa fa-4x fa-file-text-o text-primary mb-3"></i>
+        </a>
+        <h4 class="mb-3" style="font-size:18px">Paper</h4>
+      </div>
+    </div>
+
+    <div class="col-xs-2 text-center">
+      <div class="service-box mt-5 mx-auto">
+        <a href="https://github.com/princetonvisualai/HIVE" target="_blank">
+          <i class="fa fa-4x fa-github text-primary mb-3 "></i>
+        </a>
+        <h4 class="mb-3" style="font-size:18px">Code</h4>
+        </div>
+    </div>
+                                                   
+  </div>
+</div>
+
+<!-- Abstract -->
+<div class="container">
+  <h2>Abstract</h2>
+  As machine learning is increasingly applied to high-impact, high-risk domains, 
+  there have been a number of new methods aimed at making AI models more human interpretable. 
+  Despite the recent growth of interpretability work, there is a lack of systematic evaluation 
+  of proposed techniques.  In this work, we propose a novel human evaluation framework HIVE 
+  (Human Interpretability of Visual Explanations) for diverse interpretability methods in computer vision; 
+  to the best of our knowledge, this is the first work of its kind. We argue that human studies 
+  should be the gold standard in properly evaluating how interpretable a method is to human users. 
+  While human studies are often avoided due to challenges associated with cost, study design, 
+  and cross-method comparison, we describe how our framework mitigates these issues and conduct 
+  IRB-approved studies of four methods that represent the diversity of interpretability works: 
+  GradCAM, BagNet, ProtoPNet, and ProtoTree. Our results suggest that explanations 
+  (regardless of if they are actually correct) engender human trust, yet are not distinct 
+  enough for users to distinguish between correct and incorrect predictions. Lastly, we also 
+  open-source our framework to enable future studies and to encourage more human-centered approaches to interpretability.
+</div>
+  
+<!-- Citation -->
+<div class="container">
+  <h2>Citation</h2>
+  <pre><code>
+    @article{kim2021hive,
+        author = {Sunnie S. Y. Kim and Nicole Meister and Vikram V. Ramaswamy and Ruth Fong and Olga Russakovsky},
+        title = {{HIVE}: Evaluating the Human Interpretability of Visual Explanations},
+        journal = {CoRR},
+        volume = {abs/2112.XXXXX},
+        year = {2021}
+    }
+  </code></pre>
+</div>
+
+
+<!-- Method -->
+<div class="container">
+  <h2>HIVE (Human Interpretability of Visual Explanations)</h2>
+    
+  We propose HIVE, a novel human evaluation framework for diverse interpretability methods in computer vision. 
+  
+  In our work, we first lay out two desiderata of explanations used to assist human decision making: 
+  (1) Explanations should allow users to distinguish between correct and incorrect predictions. 
+  (2) Explanations should be understandable to users.
+  We then design tasks to evaluate these two desiderata, namely the <i>distinction</i> task and the <i>agreement</i> task.
+  
+  To demonstrate the extensibility and applicability of HIVE, we conduct IRB-approved human studies and evaluate 
+  four existing computer vision interpretability methods that represent different streams of interpretability work 
+  (e.g., post-hoc explanations, interpretable-by-design models, heatmaps, and prototype-based explanations): 
+  GradCAM, BagNet, ProtoPNet, ProtoTree.
+  
+  <br />
+  <br />
+            
+  <img src="imgs/UI.png" style="width:100%">
+                    
+  <br />
+  <br />
+  
+  Above are snapshots of our user interface (UI) developed in HTML and Javascript. 
+  We evaluate methods on two tasks: <i>distinction</i> (can you distinguish between correct and incorrect explanations?) 
+  and <i>agreement</i> (do you agree with the explanation?).
+  We show the distinction task for GradCAM (left) and ProtoPNet (center) and the agreement task for ProtoPNet (right).
+                                                                  
+</div>
+
+  
+  
+<!-- Results -->
+<div class="container">
+  <h2>Results</h2>
+  
+  <center><img src="imgs/results.png" style="width:40%"></center>
+  
+  <br />
+
+  Our results suggest that interpretability methods should be improved (to be closer to 100% accuracy) 
+  before they can be reliably used to aid decision making. 
+  For each study, we report the mean accuracy and standard deviation (random chance is 25% for distinction and output prediction and 50% for agreement). 
+  <i>Italics</i> denotes methods that do not statistically significantly outperform random chance (p>0.001);
+  <b>bold</b> denotes the highest performing method.  
+  
+</div>
+  
+  
+  
+<!-- Key findings -->
+<div class="container">
+  <h2>Key findings</h2>
+  
+  1. Participants struggle to distinguish between correct and incorrect explanations for all four methods.
+  This suggests that interpretability works need to improve and evaluate their ability to identify and explain model errors.
+  
+  <br />
+  <br />
+  
+  2. Participants tend to believe explanations are correct (regardless of if they are actually correct) 
+  revealing an issue of <i>confirmation bias</i> in interpretability work.
+  Prior works have made similar observations for non-visual interpretability methods; 
+  however, we substantiate them for visual explanations and demonstrate a need for falsifiable explanations in computer vision.
+  
+  <br />
+  <br />
+  
+  3. We quantify prior work's anecdotal observation that similarity of prototypes in prototype-based models are not consistent with human similarity judgements.
+  
+  <br />
+  <br />
+  
+  4. Participants prefer a model with an explanation over a baseline model. 
+  Before switching their preference, they require a baseline model to have higher accuracy (and by a greater margin for higher-risk settings).
+  
+  <br />
+  <br />
+  
+  Please see the full paper for details.
+  
+</div>
+
+
+<!-- Related Work -->
+<div class="container" >
+  <h2>Related Work</h2>
+  <div>
+  Below are some papers related to our work. We discuss them in more detail in the related work section of our paper.
+  </div>
+  
+  &nbsp;
+  
+  <div>
+    [1] <a href="https://arxiv.org/abs/1610.02391" target="_blank">Grad-CAM: Visual Explanations From Deep Networks via Gradient-Based Localization.</a>
+    Ramprasaath R. Selvaraju, Michael Cogswell, Abhishek Das, Ramakrishna Vedantam, Devi Parikh, Dhruv Batra. 
+    IJCV 2019.
+  </div>
+  
+  &nbsp;
+  
+  <div>
+    [2] <a href="https://arxiv.org/abs/1904.00760" target="_blank">Approximating CNNs with Bag-of-local-Features Models Works Surprisingly Well on ImageNet.</a>
+    Wieland Brendel, Matthias Bethge.
+    ICLR 2019.
+  </div>
+  
+  &nbsp;
+    
+  <div>
+    [3] <a href="https://arxiv.org/abs/1806.10574" target="_blank">This Looks Like That: Deep Learning for Interpretable Image Recognition.</a> 
+    Chaofan Chen, Oscar Li, Chaofan Tao, Alina Jade Barnett, Jonathan Su, Cynthia Rudin. 
+    NeurIPS 2019.
+  </div>
+    
+  &nbsp;
+    
+  <div>
+    [4] <a href="https://arxiv.org/abs/2105.02968" target="_blank">This Looks Like That... Does it? Shortcomings of Latent Space Prototype Interpretability in Deep Networks.</a> 
+    Adrian Hoffmann, Claudio Fanconi, Rahul Rade, Jonas Kohler.
+    ICML 2021 Workshop on Theoretic Foundation, Criticism, and Application Trend of Explainable AI.
+  </div>
+    
+  &nbsp;
+    
+  <div>
+    [5] <a href="https://arxiv.org/abs/2012.02046" target="_blank">Neural Prototype Trees for Interpretable Fine-grained Image Recognition.</a> 
+    Meike Nauta, Ron van Bree, Christin Seifert. 
+    CVPR 2021.
+  </div>
+    
+  &nbsp;
+    
+  <div>
+    [6]<a href="https://arxiv.org/abs/1512.03385" target="_blank">Deep Residual Learning for Image Recognition.</a>
+    Kaiming He, Xiangyu Zhang, Shaoqing Ren, Jian Sun.
+    CVPR 2016.
+  </div>
+    
+</div>
+
+<!-- Acknowledgements -->
+<div class="container">
+  <h2>Acknowledgements</h2>
+  
+  This work is supported by the National Science Foundation Grant No. 1763642 to OR, 
+  the Princeton SEAS Howard B. Wentz, Jr. Junior Faculty Award to OR, 
+  and the Princeton SEAS and ECE Senior Thesis Funding to NM.
+  We thank the authors of [1, 2, 3, 4, 5] for open-sourcing their code and the authors of [2, 4, 5, 6] for sharing their trained models.
+  We also thank the AMT workers who participated in our studies, as well as the Princeton Visual AI Lab members 
+  (Dora Zhao, Kaiyu Yang, Angelina Wang, and others) who tested our user interface and provided helpful feedback.
+  
+</div>
+  
+<div class="container" >
+  <h2>Contact</h2>
+  <div><a href="https://www.cs.princeton.edu/~suhk/" target="_blank">Sunnie S. Y. Kim</a> (sunniesuhyoung@princeton.edu)</div>
+</div>
+
+<div id="footer">
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,1303 @@
+<html>
+  <head>
+    <title>Evaluating interpretability</title>
+    <!-- simpleamt depends on these libraries -->
+    <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js'></script>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/json3/3.3.2/json3.min.js'></script>
+    <!-- end of required libraries -->
+    <script src='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js'></script>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js'></script>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- mozilla pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.0.943/pdf.min.js"></script>
+    <style>
+      #text-area {
+        margin: 10px 0;
+        font-size: 24pt;
+      }
+      #button-div {
+        margin-bottom: 10px;
+      }
+      #feedback-area {
+        margin: 10px 0;
+        font-size: 24pt;
+      }
+      #counter {
+        margin: 0 10px;
+        font-size: 20pt;
+        font-weight: bold;
+      }
+      #slider-low {
+        width: 100%;
+        margin: 2em auto;
+      }
+      #slider-low label {
+        position: absolute;
+        width: 20px;
+        margin-top: 20px;
+        margin-left: -10px;
+        text-align: center;
+      }
+      #slider-med {
+        width: 100%;
+        margin: 2em auto;
+      }
+      #slider-med label {
+        position: absolute;
+        width: 20px;
+        margin-top: 20px;
+        margin-left: -10px;
+        text-align: center;
+      }
+      #slider-high {
+        width: 100%;
+        margin: 2em auto;
+      }
+      #slider-high label {
+        position: absolute;
+        width: 20px;
+        margin-top: 20px;
+        margin-left: -10px;
+        text-align: center;
+      }
+      p {
+        font-size: 18px;
+      }
+      .btn-group button {
+        background-color: #3e3d3d; /* Green background */
+        border: 1px solid rgb(0, 0, 0); /* Green border */
+        color: white; /* White text */
+        padding: 10px 24px; /* Some padding */
+        cursor: pointer; /* Pointer/hand icon */
+        width: 50%; /* Set a width if needed */
+        display: block; /* Make the buttons appear below each other */
+      }
+      table, th, td {
+        border: none;
+        width=100%;
+        white-space:nowrap;
+        table-layout: auto;
+        padding: 10px;
+      }
+      table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        padding: 20px;
+      }
+
+      p, ul, ol, dl, table {
+        margin-bottom: 1em;
+        padding: 20px;
+        margin: 0px;
+        padding: 0px;
+        border: 0px;
+        font-size: 100%;
+        font: inherit;
+        vertical-align: baseline;
+      }
+      .right {
+        transform: rotate(-45deg);
+        -webkit-transform: rotate(-45deg);
+      }
+      .left {
+        transform: rotate(135deg);
+        -webkit-transform: rotate(135deg);
+      }
+      .up {
+        transform: rotate(-135deg);
+        -webkit-transform: rotate(-135deg);
+      }
+      .down {
+        transform: rotate(45deg);
+        -webkit-transform: rotate(45deg);
+      }
+      img {
+        height: auto;
+        width: 100%;
+      }
+      iframe {
+        width: 100%;
+        height: 50%;
+      }
+      hr {
+        display: block;
+        height: 1px;
+        border: 0;
+        border-top: 1px solid #ccc;
+        margin: 1em 0;
+        padding: 0;
+      }
+      li {
+        font-size: 18px;
+      }
+      .row_special {
+        display: grid;
+        grid-auto-flow: column;
+        gap: 10%;
+      }
+
+      .col_special {
+        display: grid;
+        grid-auto-flow: row;
+        align-items: center;
+      }
+      .double {
+        zoom: 1.5;
+        transform: scale(2);
+        -ms-transform: scale(2);
+        -webkit-transform: scale(2);
+        -o-transform: scale(2);
+        -moz-transform: scale(2);
+        transform-origin: 0 0;
+        -ms-transform-origin: 0 0;
+        -webkit-transform-origin: 0 0;
+        -o-transform-origin: 0 0;
+        -moz-transform-origin: 0 0;
+      }
+    </style>
+
+  </head>
+
+  <body>
+
+    <!-- Demographics and background -->
+
+    {% include "hit_templates/setup.html" %}
+
+
+    <!-- Model introduction -->
+    <div class='container-fluid' id="part_intro" style="display: none; ">
+      <div class='container-fluid'>
+        <h1>Model introduction</h1>
+        <p style="font-size:18px">
+          We have a model that recognizes 200 bird species in photos.
+          We have access to its prediction and an explanation for it.
+          <br>
+          <b>Please carefully read this page as the remaining study depends on your understanding of the model.</b>
+        </p>
+        <br>
+        {% include "hit_templates/intro_protopnet.html" %}
+        <br>
+        <div class='col-xs-12' id='button-div'>
+          <button class='btn btn-lg btn-primary' id="next_intro2preview" onclick="pg_intro2preview()">Next Page</button>
+        </div>
+        <br>
+      </div>
+    </div>
+
+    <!-- Task preview & Examples -->
+    <div class='container-fluid' id="part_preview" style="display: none; ">
+
+      <div class='container-fluid'>
+        <h1> Task preview  </h1>
+        <p>Here is a preview of task you will complete.</p>
+      </div>
+
+      <br>
+
+      <div class='container-fluid'>
+        <div class='col-xs-8' style="border:1px solid black;">
+          <h1>Predict the bird species</h1>
+          <p>
+            Given a bird photo, the ProtoPNet model predicts the species based on prototypes it has learned from
+            previously seen photos.
+            Specifically for each prototype, the model identifies a region in the
+            photo that looks the most similar to the prototype and rates their similarity.
+          </p>
+          <p>
+            <b>
+              For a given photo, we show explanations of how the model reasons for 4 bird species.
+              For each bird species, rate how similar each prototype is
+              to the photo region.
+              Note that the (region, prototype) pairs are presented in random order.
+              At the end, choose the bird species you think is correct.
+            </b>
+          </p>
+          <br>
+          <br>
+          <h3>
+            Please watch the below video for a quick walkthrough.
+          </h3>
+          <br>
+          <div style="position:relative;padding-top:56.25%;">
+            <iframe src="https://www.youtube.com/embed/yDHcDi7Przg" frameborder="0" allowfullscreen
+              style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
+          </div>
+          <br>
+        </div>
+        <br><br>
+      </div>
+
+      <br><br>
+
+      <!-- Example explanations -->
+      <div class='container-fluid'>
+        <h1>Example explanations</h1>
+        <p>
+          Below we show examples of a correct prediction and an incorrect prediction.
+          Please examine them and rate your level of understanding of the model.
+        </p>
+      </div>
+      <div class='container-fluid'>
+        <div class='col-xs-4'>
+          <h3>Correct prediction</h3>
+          <div id='correct1-container'></div>
+        </div>
+        <div class='col-xs-1'></div>
+        <div class='col-xs-4'>
+          <h3>Incorrect prediction</h3>
+          <div id='incorrect-container'></div>
+        </div>
+      </div>
+
+      <br><br><br>
+
+      <!-- Subjective question -->
+      <div class='container-fluid'>
+        <h3>Q. How well do you think you understand the model's reasoning process?</h3>
+        <form action="" method="post">
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective" value="1" /> <span style="font-size:18px">Very Poor</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective" value="2" /> <span style="font-size:18px">Poor</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective" value="3" /> <span style="font-size:18px">Fair</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective" value="4" /> <span style="font-size:18px">Good</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective" value="5" /> <span style="font-size:18px">Very Good</span>
+        </form>
+      </div>
+
+      <br><br><br>
+
+      <div class='col-xs-12' id='button-div'>
+        <button class='btn btn-lg btn-primary' id="next_preview2task" disabled onclick="pg_preview2task()">Next Page</button>
+      </div>
+
+      <br>
+
+    </div>
+
+
+    <!-- Main task -->
+    {% include "hit_templates/task_protopnet_distinction.html" %}
+
+
+    <!-- Post-task evaluation -->
+    <div class='container-fluid' id='part_post' style="display: none;">
+      <div class='container-fluid'>
+        <h1>Post-task evaluation</h1>
+        <br>
+        <h3>Q. How well do you think you understand the model's reasoning process?</h3>
+        <form action="" method="post">
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective2" value="1" /> <span style="font-size:18px">Very Poor</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective2" value="2" /> <span style="font-size:18px">Poor</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective2" value="3" /> <span style="font-size:18px">Fair</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective2" value="4" /> <span style="font-size:18px">Good</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective2" value="5" /> <span style="font-size:18px">Very Good</span>
+        </form>
+      </div>
+      <br><br><br>
+      <div class='col-xs-12' id='button-div'>
+        <button class='btn btn-lg btn-primary' id="next_post2perf" disabled onclick="pg_post2perf()">Next Page</button>
+      </div>
+    </div>
+
+    <!-- Your performance -->
+    <div class='container-fluid' id='part_perf' style="display: none;">
+      <div class='container-fluid'>
+        <h1>Your performance</h1>
+        <br>
+        <p>
+          You identified correct predictions for
+          <b><span id="correctcount"></span> out of <span id="correcttotal"></span></b>
+          photos in the previous task, achieving <b><span id="correctacc"></span>%</b> accuracy.
+          (Random guessing will result in 25% accuracy.)
+        </p>
+        <br>
+        <h3>Q. How well do you think you understand the model's reasoning process?</h3>
+        <form action="" method="post">
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective3" value="1" /> <span style="font-size:18px">Very Poor</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective3" value="2" /> <span style="font-size:18px">Poor</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective3" value="3" /> <span style="font-size:18px">Fair</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective3" value="4" /> <span style="font-size:18px">Good</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective3" value="5" /> <span style="font-size:18px">Very Good</span>
+        </form>
+      </div>
+      <br><br><br>
+      <div class='col-xs-12' id='button-div'>
+        <button class='btn btn-lg btn-primary' id="next_perf2choice" disabled onclick="pg_perf2choice()">Next Page</button>
+      </div>
+    </div>
+
+    <!-- Choose which model to use -->
+    {% include "hit_templates/choice_protopnet_distinction.html" %}
+
+    <!-- Feedback -->
+    <div class='container-fluid' id='part_feedback' style="display: none;">
+      <div class='col-xs-12'>
+        <h3>
+          Thank you for your participation!
+          <br><br>
+          Let us know if you have any feedback about this study.
+        </h3>
+        <textarea id='feedback-area' name='feedback-area' class='form-control tb-margin'></textarea>
+      </div>
+      {% include "hit_templates/simpleamt.html" %}
+    </div>
+
+    <!-- For slider -->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
+
+    <script>
+
+      $( function() {
+        // Low-risk
+        $( "#slider-low" ).slider({
+            value: 80, min: 70, max: 100, step: 1,
+            slide: function (e, ui) {
+                document.getElementById("low_risk").innerHTML = $('#slider-low').slider("option", "value");
+            },
+            stop: function (e, ui) {
+                document.getElementById("low_risk").innerHTML = $('#slider-low').slider("option", "value");
+            }
+        })
+        .each(function() {
+          var opt = $('#slider-low').data().uiSlider.options;
+          var vals = opt.max - opt.min;
+          for (var i = 0; i <= vals; i++) {
+            var el = $('<label>'+(opt.min+i)+'</label>').css('left',(i/vals*100)+'%');
+            $("#slider-low").append(el);
+          }
+        });
+        document.getElementById("low_risk").innerHTML = $('#slider-low').slider("option", "value");
+
+        // Med-risk
+        $( "#slider-med" ).slider({
+            value: 80, min: 70, max: 100, step: 1,
+            slide: function (e, ui) {
+                document.getElementById("med_risk").innerHTML = $('#slider-med').slider("option", "value");
+            },
+            stop: function (e, ui) {
+                document.getElementById("med_risk").innerHTML = $('#slider-med').slider("option", "value");
+            }
+        })
+        .each(function() {
+          var opt = $('#slider-med').data().uiSlider.options;
+          var vals = opt.max - opt.min;
+          for (var i = 0; i <= vals; i++) {
+            var el = $('<label>'+(opt.min+i)+'</label>').css('left',(i/vals*100)+'%');
+            $("#slider-med").append(el);
+          }
+        });
+        document.getElementById("med_risk").innerHTML = $('#slider-med').slider("option", "value");
+
+        // High-risk
+        $( "#slider-high" ).slider({
+            value: 80, min: 70, max: 100, step: 1,
+            slide: function (e, ui) {
+                document.getElementById("high_risk").innerHTML = $('#slider-high').slider("option", "value");
+            },
+            stop: function (e, ui) {
+                document.getElementById("high_risk").innerHTML = $('#slider-high').slider("option", "value");
+            }
+        })
+        .each(function() {
+          var opt = $('#slider-high').data().uiSlider.options;
+          var vals = opt.max - opt.min;
+          for (var i = 0; i <= vals; i++) {
+            var el = $('<label>'+(opt.min+i)+'</label>').css('left',(i/vals*100)+'%');
+            $("#slider-high").append(el);
+          }
+        });
+        document.getElementById("high_risk").innerHTML = $('#slider-high').slider("option", "value");
+      });
+
+      function movepage(div_prev, div_next) {
+        if (div_prev.style.display !== 'none') {
+          div_prev.style.display = 'none';
+          div_next.style.display = 'block';
+        }
+        else {
+          div_prev.style.display = 'block';
+          div_next.style.display = 'none';
+        }
+        // Jump to the top of the page
+        window.scroll({
+          top: 0,
+          left: 0,
+          behavior: 'smooth'
+        });
+      };
+
+      // Create timing object
+      timing = {};
+      timing['start'] = Date.now();
+      timing['pg_method'] = [];
+      timing['nextphoto'] = [];
+
+      // Move between pages
+      function pg_consent2demographics() {
+        timing['pg_consent2demographics'] = Date.now();
+        var div_prev = document.getElementById('part_consent');
+        var div_next = document.getElementById('part_demographics');
+        movepage(div_prev, div_next);
+      }
+      function pg_demographics2intro() {
+        timing['pg_demographics2intro'] = Date.now();
+        var div_prev = document.getElementById('part_demographics');
+        var div_next = document.getElementById('part_intro');
+        movepage(div_prev, div_next);
+      }
+
+      function pg_intro2preview() {
+        timing['pg_intro2preview'] = Date.now();
+        var div_prev = document.getElementById('part_intro');
+        var div_next = document.getElementById('part_preview');
+        movepage(div_prev, div_next);
+      }
+      function pg_preview2task() {
+        timing['pg_preview2task'] = Date.now();
+        var div_prev = document.getElementById('part_preview');
+        var div_next = document.getElementById('part_task');
+        movepage(div_prev, div_next);
+      }
+      function pg_task2post() {
+        timing['pg_task2post'] = Date.now();
+        var div_prev = document.getElementById('part_task');
+        var div_next = document.getElementById('part_post');
+        movepage(div_prev, div_next);
+      }
+      function pg_post2perf() {
+        timing['pg_post2perf'] = Date.now();
+        var div_prev = document.getElementById('part_post');
+        var div_next = document.getElementById('part_perf');
+        movepage(div_prev, div_next);
+      }
+      function pg_perf2choice() {
+        timing['pg_perf2choice'] = Date.now();
+        var div_prev = document.getElementById('part_perf');
+        var div_next = document.getElementById('part_choice');
+        movepage(div_prev, div_next);
+      }
+      function pg_choice2feedback() {
+        timing['pg_choice2feedback'] = Date.now();
+        var div_prev = document.getElementById('part_choice');
+        var div_next = document.getElementById('part_feedback');
+        movepage(div_prev, div_next);
+      }
+      function pg_method() {
+        timing['pg_method'][timing['pg_method'].length] = Date.now();
+        var div_method = document.getElementById('part_method');
+        if (div_method.style.display == 'none') {
+          div_method.style.display = 'block';
+        }
+        else {
+          div_method.style.display = 'none';
+        }
+      }
+
+      function add(accumulator, a) {
+        return accumulator + a;
+      }
+
+      var DEFAULT_INPUT = {"ID": 0, "correct1": ["https://drive.google.com/uc?export=view&id=1FYOijN1EaZ-Kj1IgsQwk0CthM0YvPW_d"],"correct2":["https://drive.google.com/uc?export=view&id=1Kau4JOvHuP5hNfUX4e0rR8eG5rgIwJTj"],"incorrect": ["https://drive.google.com/uc?export=view&id=1znfYvfz7aY09HvKa4yI4npvpplLL7QZD"], "sim": [{"testimg": "https://drive.google.com/uc?export=view&id=1O7KPCA5U7LGppVUfCPJ2OfQ7xFBuc0gO","top1": "https://drive.google.com/uc?export=view&id=1eAe6GuoO6Z71m46G99kA6L9qLsanEnr8", "top2": "https://drive.google.com/uc?export=view&id=1Hn6qjTwBL8Kz27MxigKeatXyKjh_PWn9", "top3": "https://drive.google.com/uc?export=view&id=1LaMrRcistoDQlV32PQuAZKGicROa_7Ej", "ground_truth": 1,"class1_shuffle": [ 2, 5, 6, 8, 3, 4, 10, 9, 7, 1], "class2_shuffle": [ 3,  7, 10,  5,  6,  1,  8,  9,  2,  4], "class3_shuffle": [1, 3, 6, 7, 4, 5, 2],"class1": ["https://drive.google.com/uc?export=view&id=1BZivv7gwwNxkQf0GG_Lv2ZJS28naLR8O","https://drive.google.com/uc?export=view&id=1ch-H2U-3-EpUwITMtpZw4aAuKkwnvpDM","https://drive.google.com/uc?export=view&id=1xtMPi8WKtV-Ed3h2n03h9VQZkkGld-hs","https://drive.google.com/uc?export=view&id=13bPKTRiWKxDuxFKksn-D4G3RMh_pRpiO","https://drive.google.com/uc?export=view&id=13HwhIA1QE6OFZ95gBPX4nuLXF7l6doXA","https://drive.google.com/uc?export=view&id=14i05vmRuay_tDXbBNun8MC_vnpaYaY44","https://drive.google.com/uc?export=view&id=11zTjWOW3Gy_f5bqNB6sHOL_13AYhCkz4","https://drive.google.com/uc?export=view&id=1UtyL1wKdJ2GVNm9hqbED3FE_hfIa9fN4","https://drive.google.com/uc?export=view&id=1TnzoBxb5__2yMYBHyRg7tG1jgvdSfnlv","https://drive.google.com/uc?export=view&id=1SG_vkMY6JMtZ6oWk2SFZeE1p_S899evB"], "class2": ["https://drive.google.com/uc?export=view&id=1fPLLzDcUZ9JgNMWot6tjsetWICR0qY0l","https://drive.google.com/uc?export=view&id=1TcMvJeS6I3M6DbfondnBp-9ygQkebJkG","https://drive.google.com/uc?export=view&id=1jFuNraoPbW47JAr8li5xEli_F7VlBZJo","https://drive.google.com/uc?export=view&id=1XNyBTLzBJll-BTq-jyu_hWMDpHEoyXYB","https://drive.google.com/uc?export=view&id=1g1hl1dIPaZ2AVc4HN0vZNI0f9TZ3alvZ","https://drive.google.com/uc?export=view&id=14fDI5wygB0U5Mutzq0sjmtTQWVXlEyrD","https://drive.google.com/uc?export=view&id=1XJ48NKhkVRdjQTYe6DUrd9WjC-gbw4YT","https://drive.google.com/uc?export=view&id=1_djbnQpwUSFi73245yt5QPFBW24e3PPm","https://drive.google.com/uc?export=view&id=1Au-gQuQdlr1GDjm8C8OuuppGPV30ELUb","https://drive.google.com/uc?export=view&id=1OkniAM6e51vUpSm6pUK_kqYqWay-2nu4"],"class3": ["https://drive.google.com/uc?export=view&id=1iqD6LCyR4pt_P9DoCf3y6vDvtJx306gg","https://drive.google.com/uc?export=view&id=1oHnF4auMXPqQOFJaDAbIuFpU35y6XztO","https://drive.google.com/uc?export=view&id=1UXkT8KAFtLN01ZNXfxl40_GYsZgf98-I","https://drive.google.com/uc?export=view&id=1eI2QhJ4e_eaEB8RkHRd-e4R9okRQmSNf","https://drive.google.com/uc?export=view&id=183aGOLMulH9aZ4CLWliyZG-eV2Js7gFm","https://drive.google.com/uc?export=view&id=1nyO8MKz_0xddWsjNUCahjtfdj0LUo7CR","https://drive.google.com/uc?export=view&id=1oxdlyP2AkWKOsTT8BascxbsmC3rCkkt7"]}, {"testimg": "https://drive.google.com/uc?export=view&id=1chB_VQGC6HJg3DZz3iga1oN3VTT2QT3r", "top1": "https://drive.google.com/uc?export=view&id=1MXFaIZimnN2TYT6uAhHAQg6itDoJDrAB", "top2": "https://drive.google.com/uc?export=view&id=18YJfPgjYON3dVawcQKQ57VjLRfdc-uJ4", "top3": "https://drive.google.com/uc?export=view&id=1smswOXa4LaEf-qcWfyvbCR0omzwPUVoz", "ground_truth": 2,"class2_shuffle": [2, 1, 5, 4, 3], "class1_shuffle": [5, 6, 2, 4, 7, 1, 8 ,3], "class3_shuffle": [1 , 5 , 8 , 3 , 4 , 6 , 9 , 7 , 2 ,10],"class2": ["https://drive.google.com/uc?export=view&id=1-V2Xlp9nn5Cr_vf8UacGhzrsGCSqZ3KF","https://drive.google.com/uc?export=view&id=1TufkJRbgTw3lRNzwtYqAgPg2S5-j1XuH","https://drive.google.com/uc?export=view&id=1k3z7E6MuWgVcnHCYwsB_CKks-bwYRb_y","https://drive.google.com/uc?export=view&id=1x49zXz8sMQNOe-mU98YBPdbS2nUUXKmi","https://drive.google.com/uc?export=view&id=18UVquLEcy8PyLf8Dbg5cxKxUzq16S0ZF"],"class1": ["https://drive.google.com/uc?export=view&id=1AmO_zEZFcZahowrpgFbew2LEnoSU3I0_","https://drive.google.com/uc?export=view&id=1Pk6mRHpCT6edmDu6oMA1LBdLT51x2V3P","https://drive.google.com/uc?export=view&id=1s_BCT25DjhrsUGeyfmEUyq5GagoWMzpy","https://drive.google.com/uc?export=view&id=1CIn6EluAxD1ZVQsjDoeP1ttS8kxtUMOt","https://drive.google.com/uc?export=view&id=1cz-t4TdWSOKJGKAcAxISZKpIpRKn6WVm","https://drive.google.com/uc?export=view&id=1Hm-8NwDjjz3LLlY3HXeshEPNNnPAbTDR","https://drive.google.com/uc?export=view&id=1qjt76tNxMQjLahQAmII9Lj6pFAHzKGLW","https://drive.google.com/uc?export=view&id=1NQHS9gIIZkFi71tDnE91IrXqNSHYWcQ-"], "class3": ["https://drive.google.com/uc?export=view&id=1tgg1qJZ8rpv6Ogv8mHefnkss-RhP4EOa","https://drive.google.com/uc?export=view&id=1RNgZLNVyNJv5_7nAkL9dYW3RaWybmvUk","https://drive.google.com/uc?export=view&id=1e1JgRm-ZWJl9ciFS7sDt3ezIcYp1tRR3","https://drive.google.com/uc?export=view&id=1mznRDbgUkUoOA3VARhTlIQO_HUTsJTU9","https://drive.google.com/uc?export=view&id=19CjTBtOWh9qEGmgBv8GI20H59RXuZCVD","https://drive.google.com/uc?export=view&id=1RCyXG7U7c1R8JgCFKlQHTn9ZdxmbwW9C","https://drive.google.com/uc?export=view&id=143piuGF999b9JhraChnnyx6zGlfJTRi2","https://drive.google.com/uc?export=view&id=1if5B-HmCaj7OLi54dijLHKd995Vj1kDM","https://drive.google.com/uc?export=view&id=13ze20wqOOa2YFDClUdDRKafGBfxJYzxS", "https://drive.google.com/uc?export=view&id=1rmNxT_-J4aINTOvaNxlTV2tEplDq1IWQ"]}, {"testimg": "https://drive.google.com/uc?export=view&id=1tu6TBPgBMOqBW7MWJ1lC9sp9C0Rmq5eQ", "top1": "https://drive.google.com/uc?export=view&id=1iPjvO0iaA5Vr0y-y-dYIomEkg-8EXKAQ","top2": "https://drive.google.com/uc?export=view&id=1-EcDW3EuAfS2ZZyrPt0HdPc684JaVFFn", "top3": "https://drive.google.com/uc?export=view&id=1rMgBBPQwhGC4IJjoh75mEyTpJ2lqCsYf", "ground_truth": 3, "class3_shuffle": [9, 3, 6, 1, 5, 4, 8, 7, 2], "class2_shuffle": [3, 7, 6, 2, 4, 5, 1], "class1_shuffle": [ 4, 9, 1, 6, 2, 3, 7, 5,10, 8],"class3": ["https://drive.google.com/uc?export=view&id=1oAyD13Jdh05w3mdSvVD1St-LcHAkruEr","https://drive.google.com/uc?export=view&id=1tha73sR_bVsn_zt5Mbh00_pSzjGhCEUq","https://drive.google.com/uc?export=view&id=1RSD2f9CRkEKpvas9REsVy609G6PgQl5O","https://drive.google.com/uc?export=view&id=1tkDPUmajP3pkPymKaHejHLRBpCNem7WV","https://drive.google.com/uc?export=view&id=16pJuUERiWAePVFPOHJpgfFOqN8MiS8e0","https://drive.google.com/uc?export=view&id=1eiswr9SWQLabckU7IrAfpuR-poTSI4rU","https://drive.google.com/uc?export=view&id=1fyS_n7ev5L11uhXqC4Q8oPUXNN1y1no3","https://drive.google.com/uc?export=view&id=1nXd7S_kHMJ_60JPPgU47zj76CXJLFF2p","https://drive.google.com/uc?export=view&id=1LOaCUlwQE2hQIu92Yg_BrqavV3vpNwJP"], "class2": ["https://drive.google.com/uc?export=view&id=1vEvAG_xsjWX6aoEpd63wZrfniNTyFWYv","https://drive.google.com/uc?export=view&id=1cq3p1KFs-qhCPDVuYfQ11R3g0MGZNE6i","https://drive.google.com/uc?export=view&id=1apVcItXDNr0h3jHfD3Fe_Dilxfgw7DCL","https://drive.google.com/uc?export=view&id=1XeYQwn_rqP6fsNWUiPE3BYr7_PfLkc3Y","https://drive.google.com/uc?export=view&id=1V8trFEjkX6ptN8Sq6lECMKToiF2Hzwzq","https://drive.google.com/uc?export=view&id=1KtQbgp57MYdgV1GWPkPCJE61hwLvQQVx","https://drive.google.com/uc?export=view&id=1BAq6-KZrsgA7r9mMbNpAw0jEeLkPY5uC"], "class1": ["https://drive.google.com/uc?export=view&id=1LoMRTPkArvcm7NnvhmTvvtrPGz32BO_f","https://drive.google.com/uc?export=view&id=13KHh0iYRQILl7k_82CumQWUhrZQogmjY","https://drive.google.com/uc?export=view&id=1EE7noO1LCyBWiOGaXF9sap4j6pqDLmZ0","https://drive.google.com/uc?export=view&id=13_ep194KwWFTzWlnVCzKsxQJNrzLE3KJ","https://drive.google.com/uc?export=view&id=1EE7noO1LCyBWiOGaXF9sap4j6pqDLmZ0","https://drive.google.com/uc?export=view&id=1GcwYDzjn9tNRq4uVukup5S2Ym8787FNP","https://drive.google.com/uc?export=view&id=1ZqJgSswUwihOEHUZb2I51hPWXdjIOfcx","https://drive.google.com/uc?export=view&id=1ZuqIWdYqg3aeHT8YrO-01_xDIa9bA5SQ","https://drive.google.com/uc?export=view&id=1JT3A9c2yPJkUZQO5rTZr6WzK7EGNEjD_","https://drive.google.com/uc?export=view&id=1BkkP7QjvzBv88cJGjOoA-AeU70I9MvKO"]}, {"testimg": "https://drive.google.com/uc?export=view&id=1hbwVtTI6WDK2wxevLJDeIcqGv91Y9Xj-","top1": "https://drive.google.com/uc?export=view&id=1t85eN-RpQz0C5udbkz14edGoQDKMuWDT", "top2": "https://drive.google.com/uc?export=view&id=1FOL88dcnSxj5Ty5nRyfTQJupbsfDBvpy", "top3": "https://drive.google.com/uc?export=view&id=1tfT8FqAF9IpaoGNiwZwW0Eq6OIBgDGIn", "ground_truth": 1, "class1_shuffle": [5, 1, 3, 2, 4], "class2_shuffle": [7, 4, 2, 5, 3, 6, 1], "class3_shuffle": [ 9,  5,  1,  3,  4,  2, 10,  8,  7,  6], "class1": ["https://drive.google.com/uc?export=view&id=14FZXGP41cQ8QdDOryf_JUy8DDesJ4A00","https://drive.google.com/uc?export=view&id=14T1OxTPJDtqCRqOs3TCDarwSHy6HOPjX","https://drive.google.com/uc?export=view&id=164rnVB11N-uFKFJ61G-Z9ni2KFn0EzXq","https://drive.google.com/uc?export=view&id=1AzeENqIhHsSvgS9x_B_SJY2TdA2rR6dv","https://drive.google.com/uc?export=view&id=1mhMLXiG8yWKl64jrfn1iD-AnYUndu29b"], "class2": ["https://drive.google.com/uc?export=view&id=1fU__gfY85ZYYw9eYyHnjZKkuVRNsxcWJ","https://drive.google.com/uc?export=view&id=1PSmtcaxZAYbCpR9BKI-oVI2iqU_74cyI","https://drive.google.com/uc?export=view&id=1-SF_AT_3pL2RLDadskiOozA16f1PThxU","https://drive.google.com/uc?export=view&id=1C0YnWjpDgMa8G17XYqg6dm0_MmsPPe8u","https://drive.google.com/uc?export=view&id=1q0bUb6DpytjkpEjDF2fY0gVaQs2VevLt","https://drive.google.com/uc?export=view&id=1XstVo1pGNdbr3AHymOH0SsZ_XvBsyARL","https://drive.google.com/uc?export=view&id=1D4gi2z4eY4h5XzjJeGcAUFLlu2Yu3V8b","https://drive.google.com/uc?export=view&id=1o-Jpr8vvcbC1n-WBEHLIHH16p6eG5B2o"],"class3": ["https://drive.google.com/uc?export=view&id=16aX7uTvTSBdIT74kW2F0T-hKtT1KQCIY","https://drive.google.com/uc?export=view&id=1iruUNxSMF1FP5TFaQgLPx7HPEPVOhkzD","https://drive.google.com/uc?export=view&id=1d-Nc7jt6R1nS1TjYjtsLSwqWXYh9ymMG","https://drive.google.com/uc?export=view&id=1exBK3JOr5GmZl1E1AiRsKKynt9Wc0kWX","https://drive.google.com/uc?export=view&id=1s3qhF6UtkoaDELgbCXGigMdHgKZti47q","https://drive.google.com/uc?export=view&id=1ZWU0PGgLNw26TuzLywUeDdUMbLSmofVc","https://drive.google.com/uc?export=view&id=1kKbONx06_5kLR_KXMhxM2-hgcwiZ03yP","https://drive.google.com/uc?export=view&id=1ETltwtiesTd4bP2N8vqHGQ2nveIKhBHF","https://drive.google.com/uc?export=view&id=1mIkDNObWl7ST7K0gWeMmvSFUp9OxkWmK", "https://drive.google.com/uc?export=view&id=1khIeQLikh5PsWokQj6bhkLHlQGGkHykg"]}]}
+      // Variables to record answers
+      var answers = [];
+      var descriptions = [];
+      var feedback = [];
+
+      // Some variables to track state of the HIT.
+      var enabled = false;
+      var longinput = null;
+
+      var localanswers = [];
+      var idx = 0;
+
+      var checked_radiobtns_class1 = new Array(10).fill(0);;
+      var checked_radiobtns_class2 = new Array(10).fill(0);;
+      var checked_radiobtns_class3 = new Array(10).fill(0);;
+      var checked_radiobtns_class4 = new Array(10).fill(0);;
+
+      var class1_shuffle_length;
+      var  class2_shuffle_length;
+      var  class3_shuffle_length;
+      var  class4_shuffle_length;
+
+
+      var origacc = 79.9;
+      document.getElementById("origacc").innerHTML = origacc;
+      document.getElementById("origacc_copy1").innerHTML = origacc;
+      document.getElementById("origacc_copy2").innerHTML = origacc;
+      document.getElementById("origacc_copy3").innerHTML = origacc;
+
+      function radiobtn_check() {
+        console.log("class1_shuffle_length: "+ class1_shuffle_length)
+        console.log("class2_shuffle_length: "+ class2_shuffle_length)
+        console.log("class3_shuffle_length: "+ class3_shuffle_length)
+        console.log("class4_shuffle_length: "+ class4_shuffle_length)
+
+        console.log("checked_radiobtns_class1: "+checked_radiobtns_class1)
+        console.log("checked_radiobtns_class2: "+checked_radiobtns_class2)
+        console.log("checked_radiobtns_class3: "+checked_radiobtns_class3)
+        console.log("checked_radiobtns_class4: "+checked_radiobtns_class4)
+        return (($("input[name='sim']").is(":checked")) && $("input[name='confidence_task']").is(":checked")  && (checked_radiobtns_class1.reduce(add, 0)==class1_shuffle_length)&&(checked_radiobtns_class2.reduce(add, 0)==class2_shuffle_length) && (checked_radiobtns_class3.reduce(add,0)==class3_shuffle_length) && (checked_radiobtns_class4.reduce(add,0)==class4_shuffle_length))
+      }
+
+      function record() {
+        checked_radiobtns_class1 = new Array(10).fill(0);;
+        checked_radiobtns_class2 = new Array(10).fill(0);;
+        checked_radiobtns_class3 = new Array(10).fill(0);;
+        checked_radiobtns_class4 = new Array(10).fill(0);;
+
+        timing['nextphoto'][idx] = Date.now();
+
+        results_dict = {};
+        results_dict['selectedclass'] = $('input[name=sim]:checked').val();
+        results_dict['selectedclass_confidence'] = $('input[name=confidence_task]:checked').val();
+
+        $('#class1').show();
+        $('#class2').hide();
+        $('#class3').hide();
+        $('#class4').hide();
+        $('#class1tab').addClass('active');
+        $('#class2tab').removeClass('active');
+        $('#class3tab').removeClass('active');
+        $('#class4tab').removeClass('active');
+        $('input[name=sim]').attr('checked',false); // does this reset the radio buttons?!
+
+        // store the checked items
+        class1_selection = []
+        class2_selection = []
+        class3_selection = []
+        class4_selection = []
+
+        $('#checkboxes_distinction_class1 input:checked').each(function() {
+          class1_selection.push($(this).attr('value'));
+        });
+
+        $('#checkboxes_distinction_class2 input:checked').each(function() {
+          class2_selection.push($(this).attr('value'));
+        });
+
+        $('#checkboxes_distinction_class3 input:checked').each(function() {
+          class3_selection.push($(this).attr('value'));
+        });
+
+        $('#checkboxes_distinction_class4 input:checked').each(function() {
+          class4_selection.push($(this).attr('value'));
+        });
+
+        console.log("class1_selection: "+class1_selection);
+        console.log("class2_selection: "+class2_selection);
+        console.log("class3_selection: "+class3_selection);
+        console.log("class4_selection: "+class4_selection);
+
+        // UNSHUFFLE THE PROTOTYPES
+        class1_selection_unshuffled = JSON.parse(JSON.stringify(class1_selection));
+        class2_selection_unshuffled = JSON.parse(JSON.stringify(class2_selection));
+        class3_selection_unshuffled = JSON.parse(JSON.stringify(class3_selection));
+        class4_selection_unshuffled = JSON.parse(JSON.stringify(class4_selection));
+
+        class1_shuffle = sim[idx].class1_shuffle;
+        class2_shuffle = sim[idx].class2_shuffle;
+        class3_shuffle = sim[idx].class3_shuffle;
+        class4_shuffle = sim[idx].class4_shuffle;
+
+        for (var i = 0; i < class1_selection.length; ++i) {
+          shuffle_idx = class1_shuffle[i]-1;
+          class1_selection_unshuffled[shuffle_idx] = class1_selection[i]
+        };
+        for (var i = 0; i < class2_selection.length; ++i) {
+          shuffle_idx = class2_shuffle[i]-1;
+          class2_selection_unshuffled[shuffle_idx] = class2_selection[i]
+        };
+        for (var i = 0; i < class3_selection.length; ++i) {
+          shuffle_idx = class3_shuffle[i]-1;
+          class3_selection_unshuffled[shuffle_idx] = class3_selection[i]
+        };
+        for (var i = 0; i < class4_selection.length; ++i) {
+          shuffle_idx = class4_shuffle[i]-1;
+          class4_selection_unshuffled[shuffle_idx] = class4_selection[i]
+        };
+
+        console.log("class1_selection: "+class1_selection_unshuffled);
+        console.log("class2_selection: "+class2_selection_unshuffled);
+        console.log("class3_selection: "+class3_selection_unshuffled);
+        console.log("class4_selection: "+class4_selection_unshuffled);
+
+        results_dict['class1_selection'] = class1_selection_unshuffled;
+        results_dict['class2_selection'] = class2_selection_unshuffled;
+        results_dict['class3_selection'] = class3_selection_unshuffled;
+        results_dict['class4_selection'] = class4_selection_unshuffled;
+
+        localanswers[idx] = results_dict;
+
+        // Calculate accuracy
+        var correctacclist = [];
+        var correcttotal = [];
+
+        if (idx == 3) {
+          for (var i = 0; i < 4; ++i) {
+            console.log("localanswers[i].selectedclass "+ localanswers[i].selectedclass)
+            console.log("parseInt(sim[idx].ground_truth)" + parseInt(sim[i].ground_truth))
+            if (localanswers[i].selectedclass==parseInt(sim[i].ground_truth)) {
+              correctacclist[i] = 1;
+            } else {
+              correctacclist[i] = 0;
+            }
+            correcttotal[i] = 1;
+          };
+        }
+
+        var correctcount = correctacclist.reduce(function(a, b) { return Number(a) + Number(b); }, 0);
+        var correcttotal = correcttotal.reduce(function(a, b) { return Number(a) + Number(b); }, 0);
+        var correctacc = correctcount / correcttotal;
+
+        document.getElementById("correctcount").innerHTML = correctcount;
+        document.getElementById("correcttotal").innerHTML = correcttotal;
+        document.getElementById("correctacc").innerHTML = parseFloat(correctacc*100).toFixed(1);
+        document.getElementById("correctcount2").innerHTML = correctcount;
+        document.getElementById("correcttotal2").innerHTML = correcttotal;
+        document.getElementById("correctacc2").innerHTML = parseFloat(correctacc*100).toFixed(1);
+
+
+        // reset the checked prototypes
+        $('input[name=sim]').attr('checked',false); 
+
+        $('#checkboxes_distinction_class1 input:checked').each(function() {
+          $(this).prop( "checked", false );
+        });
+        $('#checkboxes_distinction_class2 input:checked').each(function() {
+          $(this).prop( "checked", false );
+        });
+        $('#checkboxes_distinction_class3 input:checked').each(function() {
+          $(this).prop( "checked", false );
+        });
+        $('#checkboxes_distinction_class4 input:checked').each(function() {
+          $(this).prop( "checked", false );
+        });
+
+
+      };
+
+
+      $(function() {
+        $("input[name='consent']").change(function(){next_consent2demographics.disabled = false;});
+        $("input[name='ml_exp']").change(function(){next_demographics2intro.disabled = false;});
+        $("input[name='subjective']").change(function(){next_preview2task.disabled = false;});
+        $("input[name='subjective2']").change(function(){next_post2perf.disabled = false;});
+        $("input[name='subjective3']").change(function(){next_perf2choice.disabled = false;});
+
+        $("input[name='similarity1_class1']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class1[0] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity2_class1']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class1[1] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity3_class1']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class1[2] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity4_class1']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class1[3] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity5_class1']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class1[4] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity6_class1']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class1[5] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity7_class1']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class1[6] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity8_class1']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class1[7] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity9_class1']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class1[8] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity10_class1']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class1[9] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+
+        $("input[name='similarity1_class2']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class2[0] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity2_class2']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class2[1] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity3_class2']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class2[2] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity4_class2']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class2[3] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity5_class2']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class2[4] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity6_class2']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class2[5] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity7_class2']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class2[6] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity8_class2']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class2[7] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity9_class2']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class2[8] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity10_class2']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class2[9] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+
+
+        $("input[name='similarity1_class3']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class3[0] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity2_class3']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class3[1] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity3_class3']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class3[2] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity4_class3']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class3[3] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity5_class3']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class3[4] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity6_class3']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class3[5] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity7_class3']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class3[6] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity8_class3']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class3[7] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity9_class3']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class3[8] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity10_class3']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class3[9] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+
+
+        $("input[name='similarity1_class4']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class4[0] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity2_class4']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class4[1] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity3_class4']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class4[2] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity4_class4']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class4[3] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity5_class4']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class4[4] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity6_class4']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class4[5] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity7_class4']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class4[6] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity8_class4']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class4[7] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity9_class4']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class4[8] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+        $("input[name='similarity10_class4']").change(function(){
+          // if the radio button is not checked yet, increment the counter
+          checked_radiobtns_class4[9] = 1;
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+
+        $("input[name='sim']").change(function(){
+
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+
+        $("input[name='confidence_task']").change(function(){
+          if (radiobtn_check()) {
+            if (idx != 3) {next_btn.disabled = false;}
+            if (idx == 3) {next_task2post.disabled = false;}
+          };
+        });
+
+        
+        function main() {
+          // If this is a HIT on AMT, then replace the default input with the real input.
+          longinput = simpleamt.getInput(DEFAULT_INPUT);
+
+          correct1 = longinput['correct1']
+          correct2 = longinput['correct2']
+          incorrect = longinput['incorrect']
+          input_explanation = longinput['input_explanation']
+          sim = longinput['sim']
+
+          class1_shuffle_length = sim[idx].class1_shuffle.length;
+          class2_shuffle_length = sim[idx].class2_shuffle.length;
+          class3_shuffle_length = sim[idx].class3_shuffle.length;
+          class4_shuffle_length = sim[idx].class4_shuffle.length;
+
+          // Enable the UI if the HIT is not in preview mode.
+          if (!simpleamt.isPreview()) {
+            enable_hit();
+          }
+
+          // Set up the descriptions.
+          _.each(input, function() { descriptions.push(''); });
+          _.each(input, function() { feedback.push(''); });
+
+          // Preload all images
+          _.each(correct1, function(img_url) {
+            var img = new Image();
+            img.onload = function() { console.log('loaded image from ' + img_url); };
+            img.src = img_url;
+          });
+          _.each(correct2, function(img_url) {
+            var img = new Image();
+            img.onload = function() { console.log('loaded image from ' + img_url); };
+            img.src = img_url;
+          });
+          _.each(incorrect, function(img_url) {
+            var img = new Image();
+            img.onload = function() { console.log('loaded image from ' + img_url); };
+            img.src = img_url;
+          });
+
+          render();
+        };
+
+        // Use the current index to update the image and description
+        function render() {
+          // Jump to the top of the page
+          window.scroll({
+            top: 0,
+            left: 0,
+            behavior: 'smooth'
+          });
+
+          // 1_intro: 2 correct, 1 incorrect
+          $('#correct1-container').empty();
+          $('<img>').attr({'src':correct1[0], 'width':'100%'}).appendTo($('#correct1-container'));
+          $('#correct2-container').empty();
+          $('<img>').attr({'src':correct2[0], 'width':'100%'}).appendTo($('#correct2-container'));
+          $('#incorrect-container').empty();
+          $('<img>').attr({'src':incorrect[0], 'width':'100%'}).appendTo($('#incorrect-container'));
+
+          // test photo
+          $('#testimage-container').empty();
+          $('<img>').attr({
+            'src':sim[idx]['testimg'], 'width':'100%', 'align':'center'
+          }).appendTo($('#testimage-container'));
+
+          // set up 3 class explanations
+          $('#c1exp-container').empty();
+          $('<img>').attr({'src':sim[idx]['top1'], 'width':'100%'}).appendTo($('#c1exp-container'));
+          $('#c2exp-container').empty();
+          $('<img>').attr({'src':sim[idx]['top2'], 'width':'100%'}).appendTo($('#c2exp-container'));
+          $('#c3exp-container').empty();
+          $('<img>').attr({'src':sim[idx]['top3'], 'width':'100%'}).appendTo($('#c3exp-container'));
+          $('#c4exp-container').empty();
+          $('<img>').attr({'src':sim[idx]['top4'], 'width':'100%'}).appendTo($('#c4exp-container'));
+
+          class1_shuffle_length = sim[idx].class1_shuffle.length;
+          class2_shuffle_length = sim[idx].class2_shuffle.length;
+          class3_shuffle_length = sim[idx].class3_shuffle.length;
+          class4_shuffle_length = sim[idx].class4_shuffle.length;
+
+          // show all the classes first
+          for (let i = 1; i < 11; i++) {
+            id_text = 'row'+i+"_class1";
+            document.getElementById(id_text).style.display = 'block';
+          }
+          for (let i = 1; i < 11; i++) {
+            id_text = 'row'+i+"_class2";
+            document.getElementById(id_text).style.display = 'block';
+          }
+          for (let i = 1; i < 11; i++) {
+            id_text = 'row'+i+"_class3";
+            document.getElementById(id_text).style.display = 'block';
+          }
+          for (let i = 1; i < 11; i++) {
+            id_text = 'row'+i+"_class4";
+            document.getElementById(id_text).style.display = 'block';
+          }
+
+
+
+          console.log("sim[idx]['class1_shuffle'].length: " + sim[idx]['class1_shuffle'].length)
+          console.log("sim[idx]['class2_shuffle'].length: " + sim[idx]['class2_shuffle'].length)
+          console.log("sim[idx]['class3_shuffle'].length: " + sim[idx]['class3_shuffle'].length)
+          console.log("sim[idx]['class4_shuffle'].length: " + sim[idx]['class4_shuffle'].length)
+
+          // hide the class 1 prototype checkboxes
+          if (sim[idx]['class1_shuffle'].length < 10) {
+            for (let i = sim[idx]['class1_shuffle'].length + 1; i < 11; i++) {
+              id_text = 'row'+i+"_class1";
+              document.getElementById(id_text).style.display = 'none';
+            };
+          };
+          // hide the class 2 prototype checkboxes
+          if (sim[idx]['class2_shuffle'].length < 10) {
+            for (let i = sim[idx]['class2_shuffle'].length + 1; i < 11; i++) {
+              id_text = 'row'+i+"_class2";
+              document.getElementById(id_text).style.display = 'none';
+            };
+          };
+          // hide the class 3 prototype checkboxes
+          if (sim[idx]['class3_shuffle'].length < 10) {
+            for (let i = sim[idx]['class3_shuffle'].length + 1; i < 11; i++) {
+              id_text = 'row'+i+"_class3";
+              document.getElementById(id_text).style.display = 'none';
+            };
+          };
+
+          // hide the class 4 prototype checkboxes
+          if (sim[idx]['class4_shuffle'].length < 10) {
+            for (let i = sim[idx]['class4_shuffle'].length + 1; i < 11; i++) {
+              id_text = 'row'+i+"_class4";
+              document.getElementById(id_text).style.display = 'none';
+            };
+          };
+
+          $('input[name=sim]').attr('checked',false); // does this reset the radio buttons?!
+          $('input[name=confidence_task]').attr('checked',false); // does this reset the radio buttons?!
+          // set Class1 tab to active
+          // Check if 2 or 3 is active
+
+          tab2class = $('#class2tab').attr('class');
+          tab3class = $('#class3tab').attr('class');
+          tab4class = $('#class4tab').attr('class');
+          if (tab2class =='active') {
+            $('#class2tab').toggleClass('active');
+          };
+          if (tab3class =='active') {
+            $('#class3tab').toggleClass('active');
+          };
+          if (tab4class =='active') {
+            $('#class4tab').toggleClass('active');
+          };
+
+          $('#class1tab').addClass("active");
+
+          // 3_choose: Set up the text area
+          $('#text-area').val(descriptions);
+          $('#feedback-area').val(feedback);
+
+          // Refresh the counter
+          $('.counter-top').text(idx + 1);
+          $('.counter-bottom').text(4);
+
+          // If the UI is enabled, enable or disable the buttons depending on the index.
+          if (enabled) {
+            var next_task2post_btn = $('#next_task2post');
+            next_task2post_btn.prop('disabled', true);
+          };
+        };
+
+        // Save the input and update the index
+        function set_idx(new_idx) {
+          if (new_idx < 0 || new_idx >= 4) return;
+          idx = new_idx;
+          render();
+        }
+
+        // Enable the UI.
+        function enable_hit() {
+          enabled = true;
+
+
+          // Enable components
+          $('#next_btn').click(function() {
+            $('input[name=sim]').prop('checked',false);
+            $('input[name=confidence_task]').prop('checked',false);
+            next_btn.disabled = true;
+            set_idx(idx + 1);
+          });
+
+          $('#text-area').prop('disabled', false);
+          $('#feedback-area').prop('disabled', false);
+          $('#submit-btn').prop('disabled', false);
+
+          // Set up submit handler.
+          simpleamt.setupSubmit();
+          $('#submit-btn').click(function() {
+
+            timing['submit'] = Date.now();
+
+            // Choice answers
+            ml_exp = $('input[name=ml_exp]:checked').val();
+            subjective = $('input[name=subjective]:checked').val();
+            subjective2 = $('input[name=subjective2]:checked').val();
+            subjective3 = $('input[name=subjective3]:checked').val();
+
+
+            // distinguish
+            correctcount = document.getElementById("correctcount").innerHTML;
+            // sliders
+            low_risk = [];
+            med_risk = [];
+            high_risk = [];
+            low_risk.push(document.getElementById("low_risk").innerHTML);
+            med_risk.push(document.getElementById("med_risk").innerHTML);
+            high_risk.push(document.getElementById("high_risk").innerHTML);
+
+            gender = [];
+            race = [];
+
+            if ($('input[name=gender]:checked').length > 0) {
+              gender.push($('input[name=gender]:checked').val());
+            }
+            else {
+              gender.push("");
+            };
+            if ($('input[name=race]:checked').length > 0) {
+              race.push($('input[name=race]:checked').val());
+            }
+            else {race.push("");};
+
+            if (gender.length === 0) {gender = [''];};
+            if (race.length === 0) {[''];};
+
+            gender_written = []
+            gender_written.push($('#genderdescribe').val());
+
+            // Descriptions of reasons
+            descriptions = []
+            descriptions.push($('#text-area').val());
+            feedback = []
+            feedback.push($('#feedback-area').val());
+
+            // Return output
+            var output = _.map(_.zip(ml_exp,
+              subjective, subjective2, subjective3,
+              correctcount,
+              low_risk, med_risk, high_risk,
+              descriptions, gender, race, feedback, gender_written
+              ), function(x) {
+              return {'ml_exp': x[0],
+              'subjective': x[1], 'subjective2': x[2], 'subjective3': x[3],
+              'correctcount': x[4],
+              'low_risk': x[5], 'med_risk':x[6], 'high_risk':x[7],
+              'descriptions': x[8],
+              'gender': x[9], 'race': x[10], 'feedback': x[11], 'gender_written': x[12]
+            };
+            });
+            output.push({"input_ID": longinput['ID']});
+            output.push({"individual_answers": localanswers});
+            output.push({"timing": timing});
+            simpleamt.setOutput(output);
+          });
+        };
+        main();
+      });
+    </script>
+  </body>
+</html>

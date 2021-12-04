@@ -1,0 +1,993 @@
+<html>
+  <head>
+    <title>Evaluating interpretability</title>
+    <!-- simpleamt depends on these libraries -->
+    <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js'></script>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/json3/3.3.2/json3.min.js'></script>
+    <!-- end of required libraries -->
+    <script src='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js'></script>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js'></script>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- mozilla pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.0.943/pdf.min.js"></script>
+    <style>
+      #text-area {
+        margin: 10px 0;
+        font-size: 24pt;
+      }
+      #feedback-area {
+        margin: 10px 0;
+        font-size: 24pt;
+      }
+      #button-div {
+        margin-bottom: 10px;
+      }
+      #counter {
+        margin: 0 10px;
+        font-size: 20pt;
+        font-weight: bold;
+      }
+      #slider-low {
+        width: 100%;
+        margin: 2em auto;
+      }
+      #slider-low label {
+        position: absolute;
+        width: 20px;
+        margin-top: 20px;
+        margin-left: -10px;
+        text-align: center;
+      }
+      #slider-med {
+        width: 100%;
+        margin: 2em auto;
+      }
+      #slider-med label {
+        position: absolute;
+        width: 20px;
+        margin-top: 20px;
+        margin-left: -10px;
+        text-align: center;
+      }
+      #slider-high {
+        width: 100%;
+        margin: 2em auto;
+      }
+      #slider-high label {
+        position: absolute;
+        width: 20px;
+        margin-top: 20px;
+        margin-left: -10px;
+        text-align: center;
+      }
+      p {
+        font-size: 18px;
+      }
+      .right {
+        transform: rotate(-45deg);
+        -webkit-transform: rotate(-45deg);
+      }
+      .left {
+        transform: rotate(135deg);
+        -webkit-transform: rotate(135deg);
+      }
+      .up {
+        transform: rotate(-135deg);
+        -webkit-transform: rotate(-135deg);
+      }
+      .down {
+        transform: rotate(45deg);
+        -webkit-transform: rotate(45deg);
+      }
+      img {
+        height: auto;
+        width: 100%;
+      }
+      iframe {
+        width: 100%;
+        height: 50%;
+      }
+      hr {
+        display: block;
+        height: 1px;
+        border: 0;
+        border-top: 1px solid #ccc;
+        margin: 1em 0;
+        padding: 0;
+      }
+      li {
+        font-size: 18px;
+      }
+      .row_special {
+        display: grid;
+        grid-auto-flow: column;
+        gap: 10%;
+      }
+
+      .col_special {
+        display: grid;
+        grid-auto-flow: row;
+        align-items: center;
+      }
+      .double {
+        zoom: 1.5;
+        transform: scale(2);
+        -ms-transform: scale(2);
+        -webkit-transform: scale(2);
+        -o-transform: scale(2);
+        -moz-transform: scale(2);
+        transform-origin: 0 0;
+        -ms-transform-origin: 0 0;
+        -webkit-transform-origin: 0 0;
+        -o-transform-origin: 0 0;
+        -moz-transform-origin: 0 0;
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <!-- Demographics and background -->
+    {% include "hit_templates/setup.html" %}
+
+    <!-- Fruit decision tree -->
+    {% include "hit_templates/decision_tree.html" %}
+
+    <!-- Model introduction -->
+    <div class='container-fluid' id="part_intro" style="display: none; ">
+      <div class='container-fluid'>
+        <h1>Model introduction</h1>
+        <p style="font-size:18px">
+          We have a model that recognizes 200 bird species in photos.
+          We have access to its prediction and an explanation for it.
+          <br>
+          <b>
+            Please carefully read this page as the remaining study depends on your understanding of the model.
+          </b>
+        </p>
+        <br>
+        {% include "hit_templates/intro_prototree.html" %}
+        <br>
+        <div class='col-xs-12' id='button-div'>
+          <button class='btn btn-lg btn-primary' id="next_intro2preview" onclick="pg_intro2preview()">Next Page</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Task preview & Examples -->
+    <div class='container-fluid' id="part_preview" style="display: none;">
+
+      <div class='container-fluid'>
+        <h1>Task preview</h1>
+        <p>Here is a preview of the task you will complete.</p>
+      </div>
+
+      <br>
+
+      <div class='container-fluid'>
+        <div class='col-xs-8' style="border:1px solid black;">
+
+          <!-- Instructions -->
+          <div class='container-fluid'>
+            <h1>Predict the bird species</h1>
+            <p>
+              Given a bird photo, the ProtoTree model predicts the species based on prototypes it has learned from
+              previously seen photos.
+              Specifically at each step, the model identifies a region in the
+              photo that looks the most similar to the step&#39;s prototype and
+              judges whether the prototype is absent or present in the photo.
+            </p>
+            <p>
+              <b>
+                For each photo, we show the model&#39;s decisions for the first several steps.
+                For the remaining final two steps, you will decide whether the prototypes
+                are absent or present in the photo, which will lead to a bird species prediction.
+              </b>
+            </p>
+            <p>
+              Random guessing will get you 25% accuracy.
+              You will receive a reward based on your performance beyond this 25% random chance.
+            </p>
+          </div>
+
+          <br>
+
+          <!-- Photo and prediction -->
+          <div class='container-fluid'>
+
+            <!-- Photo -->
+            <div class='col-xs-3 text-center'>
+              <h4>Photo</h4>
+              <img src="https://drive.google.com/uc?export=view&id=1ixhqdKpgRaj44Yo2yAQm2plFa8pMcbg_" width=100%>
+              <!-- <p>Model predicts <b>Species <span id="Prediction"></span></b></p> -->
+            </div>
+
+            <!-- Explanation -->
+            <div class='col-xs-9 text-center'>
+              <h4>Model&#39;s decisions for the first several steps</h4>
+              <br>
+              <img src="https://drive.google.com/uc?export=view&id=1tPshKFeuV-djjqJuYOtObYzL2UrmEOXD" width=100%>
+            </div>
+
+          </div>
+
+          <br><br>
+
+          <!-- Options -->
+          <div class='container-fluid'>
+            <div class='col-xs-12 text-center'>
+              <h3>Possible decisions for the final two steps</h3>
+              <br>
+            </div>
+
+            <div class='col-xs-12' style="border:1px dotted gray;">
+              <img src="https://drive.google.com/uc?export=view&id=1-IX7oUeH9TvGpVEie6d9lBOJysrWYgC3" width=100%>
+              <br>
+              <h3>Q1. Do you think this prototype absent or present in the photo?</h3>
+              <form action="" method="post">
+                <input checked type="radio" style="height:18px; width:18px; vertical-align:top;" name="disagree1_preview" value="Absent"/>
+                <span style="font-size:18px">Absent &nbsp;</span>
+                <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="disagree1_preview" value="Present"/>
+                <span style="font-size:18px">Present &nbsp;</span>
+              </form>
+            </div>
+          </div>
+
+          <br>
+
+          <div class='container-fluid'>
+            <div class='col-xs-12' style="border:1px dotted gray;">
+              <h3>If you selected &#34;Absent&#34; in Q1:</h3>
+              <img src="https://drive.google.com/uc?export=view&id=1UXpUc3S5X8O2z9lhlzvi5JvjF9Zb755W" width=100%>
+              <br>
+              <h3>Q2-1. Do you think this prototype is absent or present in the photo?</h3>
+              <form action="" method="post">
+                <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="disagree2_preview" value="Absent"/>
+                <span style="font-size:18px">Absent &nbsp;</span>
+                <input checked type="radio" style="height:18px; width:18px; vertical-align:top;" name="disagree2_preview" value="Present"/>
+                <span style="font-size:18px">Present &nbsp;</span>
+              </form>
+            </div>
+          </div>
+
+          <br>
+
+          <div class='container-fluid'>
+            <div class='col-xs-12' style="border:1px dotted gray;">
+              <h3>If you selected &#34;Present&#34; in Q1:</h3>
+              <img src="https://drive.google.com/uc?export=view&id=1YfLGngqfHDK6c3Z3jk1fDl1kFj5fnHwz" width=100%>
+              <br>
+              <h3>Q2-2. Do you think this prototype is absent or present in the photo?</h3>
+              <form action="" method="post">
+                <input disabled type="radio" style="height:18px; width:18px; vertical-align:top;" name="disagree3_preview" value="Absent"/>
+                <span style="font-size:18px">Absent &nbsp;</span>
+                <input disabled type="radio" style="height:18px; width:18px; vertical-align:top;" name="disagree3_preview" value="Present"/>
+                <span style="font-size:18px">Present &nbsp;</span>
+              </form>
+            </div>
+          </div>
+
+          <!-- Confidence -->
+          <div class='container-fluid'>
+            <div class='col-xs-12'>
+              <h3>Q3. How confident are you in your answer?</h3>
+              <form action="" method="post">
+                <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence_preview" value="1"/>
+                <span style="font-size:18px">Not confident at all</span>
+                <br>
+                <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence_preview" value="2"/>
+                <span style="font-size:18px">Slightly confident</span>
+                <br>
+                <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence_preview" value="3"/>
+                <span style="font-size:18px">Somewhat confident</span>
+                <br>
+                <input checked type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence_preview" value="4"/>
+                <span style="font-size:18px">Fairly confident</span>
+                <br>
+                <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence_preview" value="5"/>
+                <span style="font-size:18px">Completely confident</span>
+              </form>
+            </div>
+
+          </div>
+
+          <br>
+        </div>
+      </div>
+
+      <br><br>
+
+      <!-- Example explanations -->
+      <div class='container-fluid'>
+        <h1>Example explanations</h1>
+        <p>
+          Below we show examples of a correct prediction and an incorrect prediction.
+          Please examine them and rate your level of understanding of the model.
+        </p>
+      </div>
+      <div class='container-fluid'>
+        <div class='col-xs-5'>
+          <h3>Correct prediction</h3>
+          <div id='correct-container'></div>
+        </div>
+        <div class='col-xs-1'></div>
+        <div class='col-xs-5'>
+          <h3>Incorrect prediction</h3>
+          <div id='incorrect-container'></div>
+        </div>
+      </div>
+
+      <br><br><br>
+
+      <!-- Subjective question -->
+      <div class='container-fluid'>
+        <h3>Q. How well do you think you understand the model's reasoning process?</h3>
+        <form action="" method="post">
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective" value="1" /> <span style="font-size:18px">Very Poor</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective" value="2" /> <span style="font-size:18px">Poor</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective" value="3" /> <span style="font-size:18px">Fair</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective" value="4" /> <span style="font-size:18px">Good</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective" value="5" /> <span style="font-size:18px">Very Good</span>
+        </form>
+      </div>
+
+      <br><br><br><br>
+
+      <div class='col-xs-12' id='button-div'>
+        <button class='btn btn-lg btn-primary' id="next_preview2task" disabled onclick="pg_preview2task()">Next Page</button>
+      </div>
+
+    </div>
+
+
+    <!-- Main task -->
+    {% include "hit_templates/task_prototree_distinction.html" %}
+
+
+    <!-- Post-task evaluation -->
+    <div class='container-fluid' id='part_post' style="display: none;">
+      <div class='container-fluid'>
+        <h1>Post-task evaluation</h1>
+        <br>
+        <h3>Q. How well do you think you understand the model's reasoning process?</h3>
+        <form action="" method="post">
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective2" value="1" /> <span style="font-size:18px">Very Poor</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective2" value="2" /> <span style="font-size:18px">Poor</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective2" value="3" /> <span style="font-size:18px">Fair</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective2" value="4" /> <span style="font-size:18px">Good</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective2" value="5" /> <span style="font-size:18px">Very Good</span>
+        </form>
+      </div>
+      <br><br><br>
+      <div class='col-xs-12' id='button-div'>
+        <button class='btn btn-lg btn-primary' id="next_post2perf" disabled onclick="pg_post2perf()">Next Page</button>
+      </div>
+    </div>
+
+    <!-- Your performance -->
+    <div class='container-fluid' id='part_perf' style="display: none;">
+      <div class='container-fluid'>
+        <h1>Your performance</h1>
+        <br>
+        <p>
+          You identified correct predictions for
+          <b><span id="correctcount"></span> out of <span id="correcttotal"></span></b>
+          photos in the previous task, achieving <b><span id="correctacc"></span>%</b> accuracy.
+          (Random guessing will result in 25% accuracy.)
+        </p>
+        <br>
+        <h3>Q. How well do you think you understand the model's reasoning process?</h3>
+        <form action="" method="post">
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective3" value="1" /> <span style="font-size:18px">Very Poor</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective3" value="2" /> <span style="font-size:18px">Poor</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective3" value="3" /> <span style="font-size:18px">Fair</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective3" value="4" /> <span style="font-size:18px">Good</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective3" value="5" /> <span style="font-size:18px">Very Good</span>
+        </form>
+      </div>
+      <br><br><br>
+      <div class='col-xs-12' id='button-div'>
+        <button class='btn btn-lg btn-primary' id="next_perf2choice" disabled onclick="pg_perf2choice()">Next Page</button>
+      </div>
+    </div>
+
+    <!-- Choose which model to use -->
+    {% include "hit_templates/choice_prototree_distinction.html" %}
+
+    <!-- Feedback -->
+    <div class='container-fluid' id='part_feedback' style="display: none;">
+      <div class='col-xs-12'>
+        <h3>
+          Thank you for your participation!
+          <br><br>
+          Let us know if you have any feedback about this study.
+        </h3>
+        <textarea id='feedback-area' name='feedback-area' class='form-control tb-margin'></textarea>
+      </div>
+
+      <!-- Submit -->
+      {% include "hit_templates/simpleamt.html" %}
+    </div>
+
+
+    <!-- For slider -->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
+    <script>
+
+      $( function() {
+        // Low-risk
+        $( "#slider-low" ).slider({
+            value: 82, min: 70, max: 100, step: 1,
+            slide: function (e, ui) {
+                document.getElementById("low_risk").innerHTML = $('#slider-low').slider("option", "value");
+            },
+            stop: function (e, ui) {
+                document.getElementById("low_risk").innerHTML = $('#slider-low').slider("option", "value");
+            }
+        })
+        .each(function() {
+          var opt = $('#slider-low').data().uiSlider.options;
+          var vals = opt.max - opt.min;
+          for (var i = 0; i <= vals; i++) {
+            var el = $('<label>'+(opt.min+i)+'</label>').css('left',(i/vals*100)+'%');
+            $("#slider-low").append(el);
+          }
+        });
+        document.getElementById("low_risk").innerHTML = $('#slider-low').slider("option", "value");
+
+        // Med-risk
+        $( "#slider-med" ).slider({
+            value: 82, min: 70, max: 100, step: 1,
+            slide: function (e, ui) {
+                document.getElementById("med_risk").innerHTML = $('#slider-med').slider("option", "value");
+            },
+            stop: function (e, ui) {
+                document.getElementById("med_risk").innerHTML = $('#slider-med').slider("option", "value");
+            }
+        })
+        .each(function() {
+          var opt = $('#slider-med').data().uiSlider.options;
+          var vals = opt.max - opt.min;
+          for (var i = 0; i <= vals; i++) {
+            var el = $('<label>'+(opt.min+i)+'</label>').css('left',(i/vals*100)+'%');
+            $("#slider-med").append(el);
+          }
+        });
+        document.getElementById("med_risk").innerHTML = $('#slider-med').slider("option", "value");
+
+        // High-risk
+        $( "#slider-high" ).slider({
+            value: 82, min: 70, max: 100, step: 1,
+            slide: function (e, ui) {
+                document.getElementById("high_risk").innerHTML = $('#slider-high').slider("option", "value");
+            },
+            stop: function (e, ui) {
+                document.getElementById("high_risk").innerHTML = $('#slider-high').slider("option", "value");
+            }
+        })
+        .each(function() {
+          var opt = $('#slider-high').data().uiSlider.options;
+          var vals = opt.max - opt.min;
+          for (var i = 0; i <= vals; i++) {
+            var el = $('<label>'+(opt.min+i)+'</label>').css('left',(i/vals*100)+'%');
+            $("#slider-high").append(el);
+          }
+        });
+        document.getElementById("high_risk").innerHTML = $('#slider-high').slider("option", "value");
+      });
+
+    </script>
+
+    <script>
+      function movepage(div_prev, div_next) {
+        if (div_prev.style.display !== 'none') {
+          div_prev.style.display = 'none';
+          div_next.style.display = 'block';
+        }
+        else {
+          div_prev.style.display = 'block';
+          div_next.style.display = 'none';
+        }
+        // Jump to the top of the page
+        window.scroll({
+          top: 0,
+          left: 0,
+          behavior: 'smooth'
+        });
+      }
+
+      // Create timing object
+      timing = {};
+      timing['start'] = Date.now();
+      timing['pg_method'] = [];
+      timing['nextphoto'] = [];
+      timing['pg_global'] = [];
+
+      // Move between pages
+      function pg_consent2demographics() {
+        timing['pg_consent2demographics'] = Date.now();
+        var div_prev = document.getElementById('part_consent');
+        var div_next = document.getElementById('part_demographics');
+        movepage(div_prev, div_next);
+      }
+      function pg_demographics2intro() {
+        timing['pg_demographics2intro'] = Date.now();
+        var div_prev = document.getElementById('part_demographics');
+        var div_next = document.getElementById('part_decisiontree');
+        movepage(div_prev, div_next);
+      }
+      function pg_dt2intro() {
+        timing['pg_dt2intro'] = Date.now();
+        var div_prev = document.getElementById('part_decisiontree');
+        var div_next = document.getElementById('part_intro');
+        movepage(div_prev, div_next);
+      }
+      function pg_intro2preview() {
+        timing['pg_intro2preview'] = Date.now();
+        var div_prev = document.getElementById('part_intro');
+        var div_next = document.getElementById('part_preview');
+        movepage(div_prev, div_next);
+      }
+      function pg_preview2task() {
+        timing['pg_preview2task'] = Date.now();
+        var div_prev = document.getElementById('part_preview');
+        var div_next = document.getElementById('part_task');
+        movepage(div_prev, div_next);
+      }
+      function pg_task2post() {
+        timing['pg_task2post'] = Date.now();
+        var div_prev = document.getElementById('part_task');
+        var div_next = document.getElementById('part_post');
+        movepage(div_prev, div_next);
+      }
+      function pg_post2perf() {
+        timing['pg_post2perf'] = Date.now();
+        var div_prev = document.getElementById('part_post');
+        var div_next = document.getElementById('part_perf');
+        movepage(div_prev, div_next);
+      }
+      function pg_perf2choice() {
+        timing['pg_perf2choice'] = Date.now();
+        var div_prev = document.getElementById('part_perf');
+        var div_next = document.getElementById('part_choice');
+        movepage(div_prev, div_next);
+      }
+      function pg_choice2feedback() {
+        timing['pg_choice2feedback'] = Date.now();
+        var div_prev = document.getElementById('part_choice');
+        var div_next = document.getElementById('part_feedback');
+        movepage(div_prev, div_next);
+      }
+      function pg_method() {
+        timing['pg_method'][timing['pg_method'].length] = Date.now();
+        var div_method = document.getElementById('part_method');
+        if (div_method.style.display == 'none') {
+          div_method.style.display = 'block';
+        }
+        else {
+          div_method.style.display = 'none';
+        }
+      }
+      function pg_global() {
+        timing['pg_global'][timing['pg_global'].length] = Date.now();
+      }
+
+      // Define some default input.
+      var DEFAULT_INPUT = {'input_id': [0],
+     'correct': ['https://drive.google.com/uc?export=view&id=1mJC5vz_mGAH3nERAsmCsiRgAaSqmthbB'],
+     'incorrect': ['https://drive.google.com/uc?export=view&id=1BDcFux1BBmu7sXs1_IQzCcfPV0PPUfGv'],
+     'input_image': ['https://drive.google.com/uc?export=view&id=1MiZpUvFeAAO5x36tTFN6Pl2UavU7wf5v',
+      'https://drive.google.com/uc?export=view&id=1j4otmeMGleXSP2GU6YI4f0ItVgTMkA22',
+      'https://drive.google.com/uc?export=view&id=1p5X3huRYTnrZjmIHhuRZ164eF0Uc4FVV',
+      'https://drive.google.com/uc?export=view&id=1VUg154Zoe1gOwtpdAf2y1qL3R-Wmg1Ca',
+      'https://drive.google.com/uc?export=view&id=187VB4p_GpJb100_jv2zuJ4zkM3C7d0Qc',
+      'https://drive.google.com/uc?export=view&id=1gO4d1ypHwCU7CVXeKUJOtd3FX59xMedV',
+      'https://drive.google.com/uc?export=view&id=1V6x185brO_-FyVPoBXwwQ2wAkO-MKXd6',
+      'https://drive.google.com/uc?export=view&id=1s3qJcXIIGwx0rqw5dQSd7hjNMWDSvxsr',
+      'https://drive.google.com/uc?export=view&id=12wfa0bW9vKNstyz7T4e53_oljiSM1X7Z',
+      'https://drive.google.com/uc?export=view&id=1SXM_RAlXghjyxTrZRpf6j4mq0ahCki1G'],
+     'input_explanation': ['https://drive.google.com/uc?export=view&id=13IegoQrJ9A_mtVgikZQ-EzU2VbUvw9gu',
+      'https://drive.google.com/uc?export=view&id=1ER4KIDMce_ZoLxJ_piserTFiHGq8Ztl1',
+      'https://drive.google.com/uc?export=view&id=1Un8b-p76twd3IjiqVdv4pXRwrs__nqZ2',
+      'https://drive.google.com/uc?export=view&id=1MPbc2C-ltECmcJd9XKPW13wjhIzbjb6N',
+      'https://drive.google.com/uc?export=view&id=1aREl66kyulGc11i88js5KnZYeUJYdHIF',
+      'https://drive.google.com/uc?export=view&id=1NLZ-4GaMq_jFkmljx-e0mf8tPBa40laD',
+      'https://drive.google.com/uc?export=view&id=18MTZh6bpqyzL6ASz6WoDAqVPgsp7sfHq',
+      'https://drive.google.com/uc?export=view&id=1QGt2YCvVmUWg1d52v3QY2h3JBy6SNoCU',
+      'https://drive.google.com/uc?export=view&id=1hb0IJ-PQJdd3y7A1iMETUsi2kAt_Bf_n',
+      'https://drive.google.com/uc?export=view&id=1QCxyDWue6UyxzEwhjmDgzwHzk0sSE_ie'],
+     'option1': ['https://drive.google.com/uc?export=view&id=1iZn27IDcZkPdjp_AalC4f2RVhyfAQilm',
+      'https://drive.google.com/uc?export=view&id=1Tyc1oIBZf3y_ldKkzPJjM7EQp6kYoK6q',
+      'https://drive.google.com/uc?export=view&id=1DuJ-r6K_eEj6rjL9xPEnSleljatn0uJU',
+      'https://drive.google.com/uc?export=view&id=1uX5WSramcKwYpI7qteyMTUVAJiVEmqRE',
+      'https://drive.google.com/uc?export=view&id=1P8fJlN08EvRILNeJbhlXPu7l6vm8vlo_',
+      'https://drive.google.com/uc?export=view&id=1vXg2AN0X2UVQE8_iuTlvZLcAWyvGYRYM',
+      'https://drive.google.com/uc?export=view&id=1MX-I8-orgwme2L8hoDugF1V3XBeLsuLU',
+      'https://drive.google.com/uc?export=view&id=1GDwKRsmvwuA4QUNEfUUqUPpE7ZWZONre',
+      'https://drive.google.com/uc?export=view&id=1uLjpfCCU7DXiDRcp935QfxfqK6EEiZdr',
+      'https://drive.google.com/uc?export=view&id=1Wxf5dwoiIVpxdHdbBYFv_7MCWzlwKQqe'],
+     'option2': ['https://drive.google.com/uc?export=view&id=1KsFRlUn3FNH2HTokl19SQXa2bhhdi59P',
+      'https://drive.google.com/uc?export=view&id=1kwB7fUYhYqtmLy0yFdtcLbr3e36xuvBc',
+      'https://drive.google.com/uc?export=view&id=1QmwjwBaB5qVxJlXkhumxM9pibC8EvYkd',
+      'https://drive.google.com/uc?export=view&id=1Ep9jgrSLnodLNxlGyPTsnWygNZMvCps7',
+      'https://drive.google.com/uc?export=view&id=1Qz68kjvPzoSnd0fiv25Rtrk32KNZgk0I',
+      'https://drive.google.com/uc?export=view&id=15mwcG0xRN1eRL1mni_QwP3tT5O309JjP',
+      'https://drive.google.com/uc?export=view&id=1T9QJXbLismt1J5HvUXpOCxFsv9OdDyeG',
+      'https://drive.google.com/uc?export=view&id=18qPimU67Xt7mc0-iHtDwPH2fvGYwv2NQ',
+      'https://drive.google.com/uc?export=view&id=1VZ2tcBwJuK_FrHoo2JcTxPdvdcDSH7Av',
+      'https://drive.google.com/uc?export=view&id=1NdiAhL1cz67pa8Rc9HSgyvheBZ3fqP_G'],
+     'option3': ['https://drive.google.com/uc?export=view&id=1RGsqu-N0bnxnKyTu7Od6vwpa6wu7KWR_',
+      'https://drive.google.com/uc?export=view&id=1u_xEvnR462nyc5uJirCGPbd_Ux_UE8_q',
+      'https://drive.google.com/uc?export=view&id=1f-7OCP1BOdMj61cpKTZPIAZznwUy5tPI',
+      'https://drive.google.com/uc?export=view&id=1JMAqeCVMKCh03pTQAiz6FFQkZ_2UE8th',
+      'https://drive.google.com/uc?export=view&id=1iCR66BOaQoXkkklcXbYeSlLoaMrEQJHX',
+      'https://drive.google.com/uc?export=view&id=1BwCYVrTPjiYX0TH0qQ-URx5S_aZ9nAEc',
+      'https://drive.google.com/uc?export=view&id=1OA8ukv9dye_737o1NEubs_MP-rIbB3DE',
+      'https://drive.google.com/uc?export=view&id=1mV_Bix8Yh-CPZ-qrYCc7xrQQ0SXVc4L5',
+      'https://drive.google.com/uc?export=view&id=1X0vEAnt2tZXVY15iVi79K4w2o_x3KqRx',
+      'https://drive.google.com/uc?export=view&id=169yGnsGHd8oHP_tMl6ewJE4mip5oTsBH'],
+     'groundtruth': [['Absent', 'Absent'],
+      ['Absent', 'Present'],
+      ['Absent', 'Absent'],
+      ['Present', 'Absent'],
+      ['Absent', 'Present'],
+      ['Absent', 'Absent'],
+      ['Absent', 'Present'],
+      ['Absent', 'Present'],
+      ['Present', 'Absent'],
+      ['Absent', 'Absent']]}
+
+      // Variables to record answers
+      var answers = [];
+      var descriptions = [];
+      var feedback = [];
+
+      // Some variables to track state of the HIT.
+      var enabled = false;
+      var longinput = null;
+
+      var localanswers_confidence = [];
+      var localanswers_disagree1 = [];
+      var localanswers_disagree2 = [];
+      var localanswers_disagree3 = [];
+      var idx = 0;
+
+      var origacc = 81.7;
+      document.getElementById("origacc").innerHTML = origacc;
+      document.getElementById("origacc_copy1").innerHTML = origacc;
+      document.getElementById("origacc_copy2").innerHTML = origacc;
+      document.getElementById("origacc_copy3").innerHTML = origacc;
+
+      function record() {
+
+        timing['nextphoto'][idx] = Date.now();
+
+        localanswers_confidence[idx] = $('input[name=confidence]:checked').val();
+        localanswers_disagree1[idx] = $('input[name=disagree1]:checked').val();
+        localanswers_disagree2[idx] = $('input[name=disagree2]:checked').val();
+        localanswers_disagree3[idx] = $('input[name=disagree3]:checked').val();
+
+        // Calculate accuracy
+        var correctacclist = [];
+        var correcttotal = [];
+        if (idx == 9) {
+          for (var i = 0; i < 10; ++i) {
+            if (localanswers_disagree1[i]=='Absent') {
+              if ((ground_truth[i][0]=='Absent') && (localanswers_disagree2[i]==ground_truth[i][1])) {
+                correctacclist[i] = 1;
+              } else {
+                correctacclist[i] = 0;
+              }
+            } else {
+              if ((ground_truth[i][0]=='Present') && (localanswers_disagree3[i]==ground_truth[i][1])) {
+                correctacclist[i] = 1;
+              } else {
+                correctacclist[i] = 0;
+              }
+            }
+            correcttotal[i] = 1;
+          };
+        }
+
+        var correctcount = correctacclist.reduce(function(a, b) { return Number(a) + Number(b); }, 0);
+        var correcttotal = correcttotal.reduce(function(a, b) { return Number(a) + Number(b); }, 0);
+        var correctacc = correctcount / correcttotal;
+        document.getElementById("correctcount").innerHTML = correctcount;
+        document.getElementById("correcttotal").innerHTML = correcttotal;
+        document.getElementById("correctacc").innerHTML = parseFloat(correctacc*100).toFixed(1);
+        document.getElementById("correctcount2").innerHTML = correctcount;
+        document.getElementById("correcttotal2").innerHTML = correcttotal;
+        document.getElementById("correctacc2").innerHTML = parseFloat(correctacc*100).toFixed(1);;
+      }
+
+
+      $(function() {
+
+        $("input[name='consent']").change(function(){next_consent2demographics.disabled = false;});
+        $("input[name='ml_exp']").change(function(){next_demographics2intro.disabled = false;});
+        $("input[name='subjective']").change(function(){next_preview2task.disabled = false;});
+        $("input[name='subjective2']").change(function(){next_post2perf.disabled = false;});
+        $("input[name='subjective3']").change(function(){next_perf2choice.disabled = false;});
+        $("input[name='disagree1']").change(function(){
+          if ($('input[name=disagree1]:checked').val() == 'Absent') {
+            $('input[name=disagree2]').attr("disabled", false);
+            $('input[name=disagree3]').prop('checked',false);
+            $('input[name=disagree3]').attr("disabled", true);
+            if ($("input[name='disagree2']").is(":checked") && $("input[name='confidence']").is(":checked")) {
+              if (idx != 9) {next_btn.disabled = false;}
+              if (idx == 9) {next_task2post.disabled = false;}
+            }
+          } else {
+            $('input[name=disagree2]').prop('checked',false);
+            $('input[name=disagree2]').attr("disabled", true);
+            $('input[name=disagree3]').attr("disabled", false);
+            if ($("input[name='disagree3']").is(":checked") && $("input[name='confidence']").is(":checked")) {
+              if (idx != 9) {next_btn.disabled = false;}
+              if (idx == 9) {next_task2post.disabled = false;}
+            }
+          }
+        });
+        $("input[name='confidence']").change(function(){
+          if ($("input[name='disagree1']").is(":checked") && $("input[name='disagree2']").is(":checked")) {
+            if (idx != 9) {next_btn.disabled = false;}
+            if (idx == 9) {next_task2post.disabled = false;}
+          }
+          if ($("input[name='disagree1']").is(":checked") && $("input[name='disagree3']").is(":checked")) {
+            if (idx != 9) {next_btn.disabled = false;}
+            if (idx == 9) {next_task2post.disabled = false;}
+          }
+        });
+        $("input[name='disagree2']").change(function(){
+          if ($("input[name='confidence']").is(":checked") &&
+              $("input[name='disagree1']").is(":checked") &&
+              $("input[name='disagree2']").is(":checked")) {
+            if (idx != 9) {next_btn.disabled = false;}
+            if (idx == 9) {next_task2post.disabled = false;}
+          }
+        });
+        $("input[name='disagree3']").change(function(){
+          if ($("input[name='confidence']").is(":checked") &&
+              $("input[name='disagree1']").is(":checked") &&
+              $("input[name='disagree3']").is(":checked")) {
+            if (idx != 9) {next_btn.disabled = false;}
+            if (idx == 9) {next_task2post.disabled = false;}
+          }
+        });
+
+        function main() {
+          // If this is a HIT on AMT, then replace the default input with the real input.
+          longinput = simpleamt.getInput(DEFAULT_INPUT);
+
+          correct = longinput['correct']
+          incorrect = longinput['incorrect']
+          input_image = longinput['input_image']
+          input_explanation = longinput['input_explanation']
+          ground_truth = longinput['groundtruth']
+          input_id = longinput['input_id'][0]
+          option1 = longinput['option1']
+          option2 = longinput['option2']
+          option3 = longinput['option3']
+
+          // Enable the UI if the HIT is not in preview mode.
+          if (!simpleamt.isPreview()) {
+            enable_hit();
+          }
+
+          // Set up the descriptions.
+          _.each(input, function() { descriptions.push(''); });
+          _.each(input, function() { feedback.push(''); });
+
+          // Preload all images
+          _.each(correct, function(img_url) {
+            var img = new Image();
+            img.onload = function() { console.log('loaded image from ' + img_url); };
+            img.src = img_url;
+          });
+          _.each(incorrect, function(img_url) {
+            var img = new Image();
+            img.onload = function() { console.log('loaded image from ' + img_url); };
+            img.src = img_url;
+          });
+          _.each(input_image, function(img_url) {
+            var img = new Image();
+            img.onload = function() { console.log('loaded image from ' + img_url); };
+            img.src = img_url;
+          });
+          _.each(input_explanation, function(img_url) {
+            var img = new Image();
+            img.onload = function() { console.log('loaded image from ' + img_url); };
+            img.src = img_url;
+          });
+          _.each(option1, function(img_url) {
+            var img = new Image();
+            img.onload = function() { console.log('loaded image from ' + img_url); };
+            img.src = img_url;
+          });
+          _.each(option2, function(img_url) {
+            var img = new Image();
+            img.onload = function() { console.log('loaded image from ' + img_url); };
+            img.src = img_url;
+          });
+          _.each(option3, function(img_url) {
+            var img = new Image();
+            img.onload = function() { console.log('loaded image from ' + img_url); };
+            img.src = img_url;
+          });
+
+          render();
+        }
+
+        // Use the current index to update the image and description
+        function render() {
+          // Jump to the top of the page
+          window.scroll({
+            top: 0,
+            left: 0,
+            behavior: 'smooth'
+          });
+
+          // 1_intro: 2 correct, 1 incorrect
+          $('#correct-container').empty();
+          $('<img>').attr({'src':correct[0], 'width':'100%'}).appendTo($('#correct-container'));
+          $('#incorrect-container').empty();
+          $('<img>').attr({'src':incorrect[0], 'width':'100%'}).appendTo($('#incorrect-container'));
+
+          // 2_distinguish: Set up the image
+          $('#testimage-container').empty();
+          $('<img>').attr({
+            'src':input_image[idx], 'width':'100%', 'align':'center'
+          }).appendTo($('#testimage-container'));
+          $('#pdf-container').empty();
+          $('<img>').attr({
+            'src':input_explanation[idx], 'width':'100%'
+          }).appendTo($('#pdf-container'));
+
+          $('#option1-container').empty();
+          $('<img>').attr({'src':option1[idx], 'width':'100%'}).appendTo($('#option1-container'));
+          $('#option2-container').empty();
+          $('<img>').attr({'src':option2[idx], 'width':'100%'}).appendTo($('#option2-container'));
+          $('#option3-container').empty();
+          $('<img>').attr({'src':option3[idx], 'width':'100%'}).appendTo($('#option3-container'));
+
+          $('#text-area').val(descriptions);
+          $('#feedback-area').val(feedback);
+
+          // Refresh the counter
+          $('.counter-top').text(idx + 1);
+          $('.counter-bottom').text(input_image.length);
+
+        }
+
+        // Save the input and update the index
+        function set_idx(new_idx) {
+          if (new_idx < 0 || new_idx >= input_image.length) return;
+          idx = new_idx;
+          render();
+        }
+
+        // Enable the UI.
+        function enable_hit() {
+          enabled = true;
+
+          // Enable components
+          $('#next_btn').click(function() {
+            $('input[name=disagree2]').attr("disabled", false);
+            $('input[name=disagree3]').attr("disabled", false);
+            $('input[name=disagree1]').prop('checked', false);
+            $('input[name=disagree2]').prop('checked', false);
+            $('input[name=disagree3]').prop('checked', false);
+            $('input[name=confidence]').prop('checked', false);
+            next_btn.disabled = true;
+            set_idx(idx+1)
+          });
+
+          $('#text-area').prop('disabled', false);
+          $('#feedback-area').prop('disabled', false);
+          $('#submit-btn').prop('disabled', false);
+
+          // Set up submit handler.
+          simpleamt.setupSubmit();
+          $('#submit-btn').click(function() {
+
+            timing['submit'] = Date.now();
+
+            // choice answers
+            ml_exp = $('input[name=ml_exp]:checked').val();
+            subjective = $('input[name=subjective]:checked').val();
+            subjective2 = $('input[name=subjective2]:checked').val();
+            subjective3 = $('input[name=subjective3]:checked').val();
+
+            // accuracy
+            correctcount = document.getElementById("correctcount").innerHTML;
+            correctacc = []
+            correctacc.push(document.getElementById("correctacc").innerHTML);
+
+            // decision tree answers
+            dt1_prediction = []
+            dt1_prediction.push($('input[name="dtcorrect1"]:checked').val());
+            dt1_confidence = []
+            dt1_confidence.push($('input[name="confidence1"]:checked').val());
+            dt1_mistake = []
+            dt1_mistake.push($('input[name="mistake1"]:checked').val())
+
+            dt2_prediction = []
+            dt2_prediction.push($('input[name="dtcorrect2"]:checked').val());
+            dt2_confidence = []
+            dt2_confidence.push($('input[name="confidence2"]:checked').val());
+            dt2_mistake = []
+            dt2_mistake.push($('input[name="mistake2"]:checked').val());
+
+            // sliders
+            low_risk = [];
+            med_risk = [];
+            high_risk = [];
+            low_risk.push(document.getElementById("low_risk").innerHTML);
+            med_risk.push(document.getElementById("med_risk").innerHTML);
+            high_risk.push(document.getElementById("high_risk").innerHTML);
+
+            gender = [];
+            race = [];
+
+            if ($('input[name=gender]:checked').length > 0) {
+              gender.push($('input[name=gender]:checked').val());
+            }
+            else {
+              gender.push("");
+            };
+            if ($('input[name=race]:checked').length > 0) {
+              race.push($('input[name=race]:checked').val());
+            }
+            else {race.push("");};
+
+            if (gender.length === 0) {gender = [''];};
+            if (race.length === 0) {race = [''];};
+
+            gender_written = []
+            gender_written.push($('#genderdescribe').val());
+
+            // Descriptions of reasons
+            descriptions = []
+            descriptions.push($('#text-area').val());
+            feedback = []
+            feedback.push($('#feedback-area').val());
+
+            // Return output
+            var output = _.map(_.zip(ml_exp,
+              subjective, subjective2, subjective3,
+              low_risk, med_risk, high_risk,
+              descriptions,
+              gender, gender_written, race, feedback,
+              dt1_prediction, dt1_confidence, dt1_mistake,
+              dt2_prediction, dt2_confidence, dt2_mistake,
+              correctcount, correctacc), function(x) {
+              return {'ml_exp': x[0],
+              'subjective': x[1], 'subjective2': x[2], 'subjective3': x[3],
+              'low_risk': x[4], 'med_risk':x[5], 'high_risk':x[6],
+              'descriptions': x[7],
+              'gender': x[8], 'gender_written': x[9],
+              'race': x[10], 'feedback': x[11],
+              'dt1_prediction':x[12], 'dt1_confidence':x[13], 'dt1_mistake':x[14],
+              'dt2_prediction':x[15], 'dt2_confidence':x[16], 'dt2_mistake':x[17],
+              'correctcount': x[18], 'correctacc': x[19],
+            };
+            });
+            // output.push({"input": longinput});
+            output.push({"input": input_id});
+            output.push({"individual_answers_disagree1": localanswers_disagree1});
+            output.push({"individual_answers_disagree2": localanswers_disagree2});
+            output.push({"individual_answers_disagree3": localanswers_disagree3});
+            output.push({"individual_answers_confidence": localanswers_confidence});
+            output.push({"timing": timing});
+            simpleamt.setOutput(output);
+          });
+        }
+
+        main();
+
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,136 @@
+<div class='container-fluid' id='part_task' style="display: none; ">
+
+  <!-- Instructions -->
+  <div class='container-fluid'>
+    <h1>Examine model predictions</h1>
+    <p>
+      <b>
+        For each photo, examine the model&#39;s decision for each prototype and
+        select the <i>first</i> step you disagree with the model&#39;s decision.
+        Then rate your confidence in the model&#39;s prediction.
+      </b>
+      <br>
+      <br>
+      We ask you to select the <i>first</i> step you disagree with because
+      the steps below your selected step is considered to be part of a wrong path.
+      Since the ProtoTree model has a tree structure, once it makes an incorrect decision
+      it goes on a wrong path and cannot reach the correct bird species.
+    </p>
+  </div>
+
+  <hr>
+
+  <!-- Photo and prediction -->
+  <div class='container-fluid'>
+
+    <!-- Photo -->
+    <div class='col-xs-2 text-center'>
+      <p>Photo</p>
+      <div id='testimage-container'></div>
+      <br>
+      <p>Model predicts <b>Species <span id="Prediction"></span></b></p>
+    </div>
+
+    <!-- Explanation -->
+    <div class='col-xs-7 text-center'>
+      <div id='pdf-container'></div>
+    </div>
+  </div>
+
+  <br><hr>
+
+  <!-- Select -->
+  <div class='container-fluid'>
+    <h3>
+      Q. Select the <i>first</i> step you disagree with the model&#39;s decision.
+      If you agree with all steps, select &#34;Agree with All.&#34;
+    </h3>
+    <form action="" method="post">
+      <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="disagree" value="1"/>
+      <span style="font-size:18px">Step 1 &nbsp;</span>
+      <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="disagree" value="2"/>
+      <span style="font-size:18px">Step 2 &nbsp;</span>
+      <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="disagree" value="3"/>
+      <span style="font-size:18px">Step 3 &nbsp;</span>
+      <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="disagree" value="4"/>
+      <span style="font-size:18px">Step 4 &nbsp;</span>
+      <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="disagree" value="5"/>
+      <span style="font-size:18px">Step 5 &nbsp;</span>
+      <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="disagree" value="6"/>
+      <span style="font-size:18px">Step 6 &nbsp;</span>
+      <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="disagree" value="7"/>
+      <span style="font-size:18px">Step 7 &nbsp;</span>
+      <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="disagree" value="8"/>
+      <span style="font-size:18px">Step 8 &nbsp;</span>
+      <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="disagree" value="9"/>
+      <span style="font-size:18px">Step 9 &nbsp;</span>
+      <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="disagree" value="10"/>
+      <span style="font-size:18px">Agree with All</span>
+    </form>
+  </div>
+
+  <br>
+
+  <!-- Confidence -->
+  <div class='container-fluid'>
+    <h3>Q. What do you think about the model&#39;s prediction?</h3>
+    <form action="" method="post">
+      <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence" value="4"/>
+      <span style="font-size:18px">Fairly confident that prediction is <i>correct</i></span>
+      <br>
+      <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence" value="3"/>
+      <span style="font-size:18px">Somewhat confident that prediction is <i>correct</i></span>
+      <br>
+      <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence" value="2"/>
+      <span style="font-size:18px">Somewhat confident that prediction is <u>incorrect</u></span>
+      <br>
+      <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence" value="1"/>
+      <span style="font-size:18px">Fairly confident that prediction is <u>incorrect</u></span>
+    </form>
+  </div>
+
+  <br><hr>
+
+  <!-- Next image -->
+  <div class='container-fluid'>
+    <h3>Click &#34;Next Photo&#34; after answering both questions.</h3>
+  </div>
+  <div class='container-fluid' id='button-div'>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id='counter'><span class='counter-top'></span> / <span class='counter-bottom'></span></span>
+    <br>
+    <button id='next_btn' style='background-color:#FFAC1C; border:none;' class='btn btn-lg btn-primary' onclick="record();" disabled>Next Photo</button>
+  </div>
+
+  <br><hr>
+
+  <!-- Next page -->
+  <div class='container-fluid'>
+    <h3>Click &#34;Next Page&#34; after selecting answers for all 10 photos.</h3>
+  </div>
+  <br>
+  <div class='container-fluid' id='button-div'>
+    <button disabled class='btn btn-lg btn-primary' id='next_task2post' onclick="record();pg_task2post()">Next Page <i class="arrow right"></i></button>
+  </div>
+
+  <br><hr>
+
+  <!--Method explanation-->
+  <div class='container-fluid'>
+    <h3>Click &#34;Model Description&#34; to open or close model description.</h3>
+  </div>
+  <br>
+  <div class='container-fluid' id='button-div'>
+    <button class='btn btn-lg btn-primary' style="background-color:#4CAF50; border:none;"
+    id='display_method' onclick="pg_method();">Model Description</button>
+  </div>
+  <div class='container-fluid' id="part_method" style="display: none; ">
+    <div class='col-xs-8' style="border:1px solid black;">
+      {% include "hit_templates/intro_prototree.html" %}
+      <br><br>
+    </div>
+    <br><br><br>
+  </div>
+
+  <br><br><br>
+
+</div>

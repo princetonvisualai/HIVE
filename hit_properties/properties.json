@@ -1,0 +1,13 @@
+{
+  "Title": "Evaluate how interpretable a model is",
+  "Description": "Given explanation of how an object recognition model makes its prediction, evaluate how interpretable it is.",
+  "Keywords": "interpretability, evaluation, artificial intelligence, machine learning, computer vision",
+  "Reward": 2.00,
+  "LifetimeInSeconds": 604800,
+  "AssignmentDurationInSeconds": 900,
+  "FrameHeight": 20000,
+  "MaxAssignments": 5,
+  "PercentApproved": 98,
+  "HitsApproved": 1000,
+  "Country": ["US"]
+}

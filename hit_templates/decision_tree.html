@@ -1,0 +1,265 @@
+<div class='container-fluid' id="part_decisiontree" style="display: none; ">
+  <div class='container-fluid'>
+    <h1>Warming up</h1>
+    <p>
+      This page is meant to give you a sense of the model and the task we will introduce in this study.
+      <br>
+      <br>
+      Here we have an example model that classifies fruit photos into Fruit A, B, C, D, E based on
+      a series of decisions regarding Color, Count, and Shape.
+      Specifically, this model makes decisions in a tree structure as you can see below.
+      <!-- To prepare for the task, we will provide a simplified tree to demonstrate a model's decision making. -->
+      <!-- <br> -->
+      <!-- The model classifies the fruit image as class A, B, C, D, or E based on a series of decision regarding Color, Count, and Shape.
+      If the fruit's Color is Red, the model will classify it as Class "C". -->
+    </p>
+
+    <hr>
+
+    <div class='container-fluid'>
+      <div class='row'>
+        <h3>Example</h3>
+        <p>
+          For this example photo, the model reasons in the following way:
+          The model first judges that the photo's fruit has <b>Color</b> &#34;Yellow.&#34
+          Based on this decision, it moves onto the next step and judges that the
+          fruit has <b>Shape</b> &#34;Skinny.&#34;
+          After these two decisions, the model arrives at its prediction: <b>Fruit E</b>.
+        </p>
+        <br><br>
+        <div class='col-xs-2 text-center'>
+          <p style="font-size:18px">Example Photo</p>
+          <img src="https://drive.google.com/uc?export=view&id=1P0ZR6crgnuM4wk4K6L_xoI6tCWkkVLs3">
+          <br>
+          <p style="font-size:18px">Model predicts <b>Fruit E</b></p>
+        </div>
+
+        <div class='col-xs-4 text-center'>
+          <p style="font-size:18px">Model&#39;s decision process</p>
+          <img src="https://drive.google.com/uc?export=view&id=14WtR44EkiF6pPPF962F-IixoU8IqhSh5" width="800" height="500">
+        </div>
+
+        <div class='col-xs-6 text-left'>
+          <p><b>Q. Is the model's prediction correct or incorrect?</b></p>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dtcorrect" name="dtcorrect0" value="Correct" checked>
+          <span style="font-size:18px">Correct &nbsp;</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dtincorrect" name="dtcorrect0" value="Incorrect">
+          <span style="font-size:18px">Incorrect &nbsp;</span>
+          <br><br>
+          <p><b>Q. What do you think about the model&#39;s prediction?</b></p>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dt4" name="confidence0" value="4" checked>
+          <span style="font-size:18px">Fairly confident that prediction is <i>correct</i></span><br>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dt3" name="confidence0" value="3">
+          <span style="font-size:18px">Somewhat confident that prediction is <i>correct</i></span><br>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dt2" name="confidence0" value="2">
+          <span style="font-size:18px">Somewhat confident that prediction is <u>incorrect</u></span><br>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dt1" name="confidence0" value="1">
+          <span style="font-size:18px">Fairly confident that prediction is <u>incorrect</u></span>
+          <br><br>
+          <p><b>
+            Q. Choose the first step where you think the model makes a mistake.
+            If you think the model makes no mistakes, select &#34;None.&#34;
+          </b></p>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dtNone" name="mistake0" value="None" checked>
+          <span style="font-size:18px">None &nbsp;</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dtColor" name="mistake0" value="Color">
+          <span style="font-size:18px">Color &nbsp;</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dtCount" name="mistake0" value="Count">
+          <span style="font-size:18px">Count &nbsp;</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dtShape" name="mistake0" value="Shape">
+          <span style="font-size:18px">Shape &nbsp;</span>
+        </div>
+
+      </div>
+    </div>
+
+    <hr>
+
+    <div class='container-fluid'>
+      <div class='row'>
+        <h3>Your Turn!</h3>
+        <p>
+          After examining the photo and the model's decision process,
+          please answer the three questions as above, then click &#34;Submit.&#34;
+        </p>
+        <br><br>
+        <div class='col-xs-2 text-center'>
+          <p style="font-size:18px">Photo 1</p>
+          <img src="https://drive.google.com/uc?export=view&id=14I09M-eMokVp19gPaSFxIPutV_J591I_">
+          <br>
+          <p style="font-size:18px">Model predicts <b>Fruit B</b></p>
+        </div>
+
+        <div class='col-xs-4 text-center'>
+          <p style="font-size:18px">Model&#39;s decision process</p>
+          <img src="https://drive.google.com/uc?export=view&id=1Wt9peWnZjopmkI_6Qt61mrDfswtLODdd" width="800" height="500">
+        </div>
+
+
+        <div class='col-xs-6 text-left'>
+          <p><b>Q. Is the model's prediction correct or incorrect?</b></p>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dtcorrect" name="dtcorrect1" value="Correct" >
+          <span style="font-size:18px"> Correct &nbsp;</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dtincorrect" name="dtcorrect1" value="Incorrect">
+          <span style="font-size:18px"> Incorrect &nbsp;</span>
+          <br><br>
+          <p><b>Q. What do you think about the model&#39;s prediction?</b></p>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dt4" name="confidence1" value="4">
+          <span style="font-size:18px">Fairly confident that prediction is <i>correct</i></span><br>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dt3" name="confidence1" value="3">
+          <span style="font-size:18px">Somewhat confident that prediction is <i>correct</i></span><br>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dt2" name="confidence1" value="2">
+          <span style="font-size:18px">Somewhat confident that prediction is <u>incorrect</u></span><br>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dt1" name="confidence1" value="1">
+          <span style="font-size:18px">Fairly confident that prediction is <u>incorrect</u></span>
+          <br><br>
+          <p><b>
+            Q. Choose the first step where you think the model makes a mistake.
+            If you think the model makes no mistakes, select &#34;None.&#34;
+          </b></p>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dtNone" name="mistake1" value="None">
+          <span style="font-size:18px"> None &nbsp;</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dtColor" name="mistake1" value="Color">
+          <span style="font-size:18px"> Color &nbsp;</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dtCount" name="mistake1" value="Count">
+          <span style="font-size:18px"> Count &nbsp;</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dtShape" name="mistake1" value="Shape">
+          <span style="font-size:18px""> Shape &nbsp;</span>
+          <br>
+          <input type='submit' class='btn btn-lg btn-success' disabled id='submit_btn1' onclick="submitdt1();" value='Submit'/>
+          <br>
+          <br>
+          <div class="alert alert-success" id='success1' style="display: none; ">
+            <strong>Correct!</strong> You have successfully identified that the model's decision is incorrect and that the model made a mistake on the Color decision.
+          </div>
+          <br>
+          <div class="alert alert-danger" id='fail1' style="display: none; ">
+            <strong>Incorrect. </strong> The model's decision is incorrect and the model made its first mistake on the Color decision.
+            The model judges that the fruit in the photo is Green, but it is Yellow. Please try again with Photo 2.
+          </div>
+        </div>
+      </div>
+
+      <br><br>
+
+      <div class='row'>
+        <div class='col-xs-2 text-center'>
+          <p style="font-size:18px">Photo 2</p>
+          <img src="https://drive.google.com/uc?export=view&id=12R7IsBv4i_AeNgK-dI1HqGvet1dm_bfX">
+          <br>
+          <p style="font-size:18px">Model predicts <b>Fruit A</b></p>
+        </div>
+
+        <div class='col-xs-4 text-center'>
+          <p style="font-size:18px">Model&#39;s decision process</p>
+          <img src="https://drive.google.com/uc?export=view&id=1Y8J4-N1oQW1vcL0lpdYN8c7M7-BICzUw" width="800" height="500">
+        </div>
+
+        <div class='col-xs-6 text-left'>
+          <p><b>Q. Is the model's prediction correct or incorrect?</b></p>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dtcorrect" name="dtcorrect2" value="Correct" >
+          <span style="font-size:18px"> Correct &nbsp;</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dtincorrect" name="dtcorrect2" value="Incorrect">
+          <span style="font-size:18px"> Incorrect &nbsp;</span>
+          <br><br>
+          <p><b>Q. How confident are you in the model's decision?</b></p>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dt4" name="confidence2" value="4">
+          <span style="font-size:18px">Fairly confident that prediction is <i>correct</i></span><br>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dt3" name="confidence2" value="3">
+          <span style="font-size:18px">Somewhat confident that prediction is <i>correct</i></span><br>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dt2" name="confidence2" value="2">
+          <span style="font-size:18px">Somewhat confident that prediction is <u>incorrect</u></span><br>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dt1" name="confidence2" value="1">
+          <span style="font-size:18px">Fairly confident that prediction is <u>incorrect</u></span>
+          <br><br>
+          <p><b>
+            Q. Choose the first step where you think the model makes a mistake.
+            If you think the model makes no mistakes, select &#34;None.&#34;
+          </b></p>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dtNone" name="mistake2" value="None">
+          <span style="font-size:18px"> None &nbsp;</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dtColor" name="mistake2" value="Color">
+          <span style="font-size:18px"> Color &nbsp;</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dtCount" name="mistake2" value="Count">
+          <span style="font-size:18px"> Count &nbsp;</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" id="dtShape" name="mistake2" value="Shape">
+          <span style="font-size:18px"> Shape &nbsp;</span>
+          <br>
+          <input type='submit' class='btn btn-lg btn-success' id='submit_btn2' onclick="submitdt2();" value='Submit' disabled/>
+          <br>
+          <div class="alert alert-success" id='success2' style="display: none; ">
+            <strong>Correct!</strong> You have successfully identified that the model's decision is correct and that the model made no mistakes.
+          </div>
+          <br>
+          <div class="alert alert-danger" id='fail2' style="display: none; ">
+            <strong>Incorrect. </strong> The model's decision is correct.
+            The model correctly judges that the fruit in the photo is Green and that there are less than 3 fruits in the photo.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br>
+  <br>
+  <div class='col-xs-12' id='button-div'>
+    <button class='btn btn-lg btn-primary' disabled id="next_intro2preview" onclick="pg_dt2intro()">Next Page <i class="arrow right"></i> </button>
+  </div>
+</div>
+
+<script>
+  // document ready (jquery shortcut)
+  $(function() {
+    $("input[name='confidence2']").change(function(){
+    if($("input[name='mistake2']").is(':checked') && $("input[name='dtcorrect2']").is(':checked')) {
+      submit_btn2.disabled = false;
+    }});
+  $("input[name='mistake2']").change(function(){
+    if($("input[name='confidence2']").is(':checked') && $("input[name='dtcorrect2']").is(':checked')) {
+      submit_btn2.disabled = false;
+    }});
+  $("input[name='dtcorrect2']").change(function(){
+    if($("input[name='mistake2']").is(':checked') && $("input[name='confidence2']").is(':checked')) {
+      submit_btn2.disabled = false;
+    }});
+
+  $("input[name='confidence1']").change(function(){
+    if($("input[name='mistake1']").is(':checked') && $("input[name='dtcorrect1']").is(':checked')) {
+      submit_btn1.disabled = false;
+    }});
+  $("input[name='mistake1']").change(function(){
+    if($("input[name='confidence1']").is(':checked') && $("input[name='dtcorrect1']").is(':checked')) {
+      submit_btn1.disabled = false;
+    }});
+  $("input[name='dtcorrect1']").change(function(){
+    if($("input[name='mistake1']").is(':checked') && $("input[name='confidence1']").is(':checked')) {
+      submit_btn1.disabled = false;
+    }});
+
+   });
+
+
+  function submitdt1() {
+
+    if (($('input[name="dtcorrect1"]:checked').val() == 'Incorrect') && ($('input[name="mistake1"]:checked').val() == 'Color')) {
+      // show correct
+      document.getElementById('success1').style.display = 'block';
+    }
+    else {
+      // show incorrect
+      document.getElementById('fail1').style.display = 'block';
+    }
+  };
+
+  function submitdt2() {
+    document.getElementById('next_intro2preview').disabled = false;
+    if (($('input[name="dtcorrect2"]:checked').val() == 'Correct') && ($('input[name="mistake2"]:checked').val() == 'None')) {
+      // show correct
+      document.getElementById('success2').style.display = 'block';
+    }
+    else {
+      // show incorrect
+      document.getElementById('fail2').style.display = 'block';
+    }
+
+  };
+</script>

@@ -1,0 +1,259 @@
+<html>
+  <head>
+    <title>Evaluating interpretability</title>
+    <!-- simpleamt depends on these libraries -->
+    <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js'></script>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/json3/3.3.2/json3.min.js'></script>
+    <!-- end of required libraries -->
+    <script src='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js'></script>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js'></script>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      #text-area {
+        margin: 10px 0;
+        font-size: 24pt;
+      }
+      #button-div {
+        margin-bottom: 10px;
+      }
+      #counter {
+        margin: 0 10px;
+        font-size: 20pt;
+        font-weight: bold;
+      }
+      p {
+        font-size: 18px;
+      }
+      hr {
+        display: block;
+        height: 1px;
+        border: 0;
+        border-top: 1px solid #ccc;
+        margin: 1em 0;
+        padding: 0;
+      }
+      li {
+        font-size: 18px;
+      }
+      .row_special {
+        display: grid;
+        grid-auto-flow: column;
+        gap: 10%;
+      }
+
+      .col_special {
+        display: grid;
+        grid-auto-flow: row;
+        align-items: center;
+      }
+      .double {
+        zoom: 1.5;
+        transform: scale(2);
+        -ms-transform: scale(2);
+        -webkit-transform: scale(2);
+        -o-transform: scale(2);
+        -moz-transform: scale(2);
+        transform-origin: 0 0;
+        -ms-transform-origin: 0 0;
+        -webkit-transform-origin: 0 0;
+        -o-transform-origin: 0 0;
+        -moz-transform-origin: 0 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class='container-fluid' id='part_task' style="display: none;">
+
+      <div class='container-fluid'>
+        <h1>Examine model predictions</h1>
+        <p>
+          Given a bird photo, the ProtoPNet model predicts the species based on prototypes it has learned from
+          previously seen photos.
+          Specifically for each prototype, the model identifies a region in the
+          photo that looks the most similar to the prototype and rates their similarity.
+        </p>
+        <p>
+          <b>
+            Judge whether you agree with the model's identified region by rating the region and prototype similar from on a scale of 1-4 
+            At the end, rate your confidence in the model's prediction.
+          </b>
+        </p>
+        <p>
+          Note that the (photo region, prototype) pairs are presented in order of similarity, from high similarity to low.
+          When making its prediction, the model places more importance on pairs with higher similarity.
+        </p>
+        <br>
+      </div>
+
+      <hr>
+
+      <div class='container-fluid'>
+        <h3>Task: Rate the similarity of each row's prototype-region pair on a scale of 1-4. <br>
+          (1: Not Similar, 2: Somewhat Not Similar, 3: Somewhat Similar, 4: Similar)
+        </h3>
+        <br>
+        <div class='col-xs-3'>
+          <div id='testimage-container'></div>
+          <br>
+          <p>
+            The model predicts <b>Species <span id="Prediction"></span></b> for this photo.
+            <br>
+            <br>
+            Shown on the right is the model's explanation for its prediction,
+            so all prototypes and their source photos are from <b>Species <span id="Prediction2"></span></b>.
+          </p>
+        </div><!-- End of photo -->
+
+        <div class='col-xs-9'>
+          <div class='container-fluid'>
+            <div class='col-xs-9'>
+              <div class='row_special'>
+
+                <!-- Column 1 -->
+                <div class='col_special'>
+                  <div id='pdf-container'>
+                  </div>
+                </div>
+
+                <!-- Column 2 -->
+                
+                <div id='checkboxes_distinction' class='col_special'>
+                  <div  id="row1" class="double">
+                    <input type="radio" name="similarity1" value="1" style="vertical-align:top">1
+                    <input type="radio" name="similarity1" value="2" style="vertical-align:top">2
+                    <input type="radio" name="similarity1" value="3" style="vertical-align:top">3
+                    <input type="radio" name="similarity1" value="4" style="vertical-align:top">4
+                    <!-- <span style="margin-left:5px; font-size:10px">Row 1</span> -->
+                  </div>
+                  <div id="row2" class="double">
+                   <input type="radio" name="similarity2" value="1" style="vertical-align:top">1
+                    <input type="radio" name="similarity2" value="2" style="vertical-align:top">2
+                    <input type="radio" name="similarity2" value="3" style="vertical-align:top">3
+                    <input type="radio" name="similarity2" value="4" style="vertical-align:top">4
+                  </div>
+                  <div id="row3" class="double">
+                   <input type="radio" name="similarity3" value="1" style="vertical-align:top">1
+                    <input type="radio" name="similarity3" value="2" style="vertical-align:top">2
+                    <input type="radio" name="similarity3" value="3" style="vertical-align:top">3
+                    <input type="radio" name="similarity3" value="4" style="vertical-align:top">4
+                  </div>
+                  <div id="row4" class="double">
+                   <input type="radio" name="similarity4" value="1" style="vertical-align:top">1
+                    <input type="radio" name="similarity4" value="2" style="vertical-align:top">2
+                    <input type="radio" name="similarity4" value="3" style="vertical-align:top">3
+                    <input type="radio" name="similarity4" value="4" style="vertical-align:top">4
+                  </div>
+                  <div id="row5" class="double">
+                   <input type="radio" name="similarity5" value="1" style="vertical-align:top">1
+                    <input type="radio" name="similarity5" value="2" style="vertical-align:top">2
+                    <input type="radio" name="similarity5" value="3" style="vertical-align:top">3
+                    <input type="radio" name="similarity5" value="4" style="vertical-align:top">4
+                  </div>
+                  <div id="row6" class="double">
+                   <input type="radio" name="similarity6" value="1" style="vertical-align:top">1
+                    <input type="radio" name="similarity6" value="2" style="vertical-align:top">2
+                    <input type="radio" name="similarity6" value="3" style="vertical-align:top">3
+                    <input type="radio" name="similarity6" value="4" style="vertical-align:top">4
+                  </div>
+                  <div id="row7" class="double">
+                   <input type="radio" name="similarity7" value="1" style="vertical-align:top">1
+                    <input type="radio" name="similarity7" value="2" style="vertical-align:top">2
+                    <input type="radio" name="similarity7" value="3" style="vertical-align:top">3
+                    <input type="radio" name="similarity7" value="4" style="vertical-align:top">4
+                  </div>
+                  <div id="row8" class="double">
+                   <input type="radio" name="similarity8" value="1" style="vertical-align:top">1
+                    <input type="radio" name="similarity8" value="2" style="vertical-align:top">2
+                    <input type="radio" name="similarity8" value="3" style="vertical-align:top">3
+                    <input type="radio" name="similarity8" value="4" style="vertical-align:top">4
+                  </div>
+                  <div id="row9" class="double">
+                   <input type="radio" name="similarity9" value="1" style="vertical-align:top">1
+                    <input type="radio" name="similarity9" value="2" style="vertical-align:top">2
+                    <input type="radio" name="similarity9" value="3" style="vertical-align:top">3
+                    <input type="radio" name="similarity9" value="4" style="vertical-align:top">4
+                  </div>
+                  <div id="row10" class="double">
+                    <input type="radio" name="similarity10" value="1" style="vertical-align:top">1
+                    <input type="radio" name="similarity10" value="2" style="vertical-align:top">2
+                    <input type="radio" name="similarity10" value="3" style="vertical-align:top">3
+                    <input type="radio" name="similarity10" value="4" style="vertical-align:top">4
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div> <!-- End of row selection -->
+      </div> <!-- End of task section -->
+
+      <br><br><br>
+
+
+      <!-- Confidence -->
+      <div class='container-fluid'>
+
+        <!-- Given that the model makes a prediction on the bird species based on the similarity of the photo region-prototype pairs (presented above from most similar to least similar), -->
+        <h3>Q. What do you think about the model&#39;s prediction?</h3>
+        <form action="" method="post">
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence" value="4"/>
+          <span style="font-size:18px">Fairly confident that prediction is <i>correct</i></span>
+          <br>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence" value="3"/>
+          <span style="font-size:18px">Somewhat confident that prediction is <i>correct</i></span>
+          <br>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence" value="2"/>
+          <span style="font-size:18px">Somewhat confident that prediction is <u>incorrect</u></span>
+          <br>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="confidence" value="1"/>
+          <span style="font-size:18px">Fairly confident that prediction is <u>incorrect</u></span>
+        </form>
+      </div>
+
+      <br><hr>
+
+      <!-- Next photo -->
+      <div class='container-fluid'>
+        <h3>Click &#34;Next Photo&#34; after selecting the rows and answering the question.</h3>
+      </div>
+      <div class='container-fluid' id='button-div'>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id='counter'><span class='counter-top'></span> / <span class='counter-bottom'></span></span>
+        <br>
+        <button id='next_btn' style='background-color:#FFAC1C; border:none;' class='btn btn-lg btn-primary' onclick="record();" disabled>Next Photo</button>
+      </div>
+
+      <br><hr>
+
+      <!-- Next page -->
+      <div class='container-fluid'>
+        <h3>Click &#34;Next Page&#34; after selecting answers for all 10 photos.</h3>
+      </div>
+      <br>
+      <div class='container-fluid' id='button-div'>
+        <button disabled class='btn btn-lg btn-primary' id='next_task2post' onclick="record();pg_task2post();">Next Page</button>
+      </div>
+
+      <br><hr>
+
+      <!--Method description-->
+      <div class='container-fluid'>
+        <h3>Click &#34;Model Description&#34; to open or close model description.</h3>
+      </div>
+      <div class='container-fluid' id='button-div'>
+        <button class='btn btn-lg btn-primary' style="background-color:#4CAF50; border:none;"
+        id='display_method' onclick="pg_method();">Model Description</button>
+      </div>
+      <div class='container-fluid' id="part_method" style="display: none;">
+        <div class='col-xs-8' style="border:1px solid black;">
+          {% include "hit_templates/intro_protopnet.html" %}
+          <br><br>
+        </div>
+        <br><br>
+      </div>
+
+      <br><br>
+
+    </div>
+
+  </body>
+</html>

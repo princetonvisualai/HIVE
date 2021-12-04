@@ -1,0 +1,50 @@
+<div class='container-fluid'>
+  <div class='col-xs-10'>
+    <h2>GradCAM</h2>
+    <p>
+      GradCAM is a popular visualization technique that highlights important
+      regions in a photo for a given model to recognize a certain object (e.g., chair, desk, hornbill).
+      In a GradCAM explanation, red regions corresponds to important regions
+      (see the colorbar for more information).
+      For each photo below, we show GradCAM explanations for three classes.
+    </p>
+  </div>
+</div>
+<br>
+<div class='container-fluid'>
+  <div class='col-xs-10'>
+    <p>
+      For the first photo of a <b>hornbill</b>, which is a type of a bird,
+      the model <i>correctly</i> classifies it as a <b>hornbill</b>.
+      GradCAM identifies the tip of the beak as the important region for this classification (left heatmap).
+      On the other hand, different regions are identified as important for the model
+      to <i>incorrectly</i> classify this photo as a <b>panther</b> or a <b>junco bird</b>.
+    </p>
+  </div>
+</div>
+<br>
+<div class='container-fluid'>
+  <div class='col-xs-10'>
+    <img src="https://drive.google.com/uc?export=view&id=1kfYxKDZEjEaeEpZ4DSq0NU0pHu0onhsF" width=100%>
+  </div>
+</div>
+<br><br>
+<div class='container-fluid'>
+  <div class='col-xs-10'>
+    <p>
+      For the second photo of a <b>television</b>, the model <i>incorrectly</i>
+      classifies this photo as a <b>tobacco shop</b>.
+      According to GradCAM, the important regions for this classification are the
+      colorful switches under the television and above the person's head (middle heatmap).
+      Again, different regions are identified as important for the model
+      to <i>correctly</i> classify this photo as a <b>television</b> or
+      <i>incorrectly</i> classify it as a <b>strawberry</b>.
+    </p>
+  </div>
+</div>
+<br>
+<div class='container-fluid'>
+  <div class='col-xs-10'>
+    <img src="https://drive.google.com/uc?export=view&id=1dHVQj1WOSO2F3AQOmhTSSNKF0a6KWWW1" width=100%>
+  </div>
+</div>

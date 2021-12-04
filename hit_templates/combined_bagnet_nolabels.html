@@ -1,0 +1,679 @@
+<html>
+  <head>
+    <title>Evaluating interpretability</title>
+    <!-- simpleamt depends on these libraries -->
+    <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js'></script>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/json3/3.3.2/json3.min.js'></script>
+    <!-- end of required libraries -->
+    <script src='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js'></script>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js'></script>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- mozilla pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.0.943/pdf.min.js"></script>
+    <style>
+      #text-area {
+        margin: 10px 0;
+        font-size: 24pt;
+      }
+      #feedback-area {
+        margin: 10px 0;
+        font-size: 24pt;
+      }
+      #button-div {
+        margin-bottom: 10px;
+      }
+      #counter {
+        margin: 0 10px;
+        font-size: 20pt;
+        font-weight: bold;
+      }
+      #slider-low {
+        width: 100%;
+        margin: 2em auto;
+      }
+      #slider-low label {
+        position: absolute;
+        width: 20px;
+        margin-top: 20px;
+        margin-left: -10px;
+        text-align: center;
+      }
+      #slider-med {
+        width: 100%;
+        margin: 2em auto;
+      }
+      #slider-med label {
+        position: absolute;
+        width: 20px;
+        margin-top: 20px;
+        margin-left: -10px;
+        text-align: center;
+      }
+      #slider-high {
+        width: 100%;
+        margin: 2em auto;
+      }
+      #slider-high label {
+        position: absolute;
+        width: 20px;
+        margin-top: 20px;
+        margin-left: -10px;
+        text-align: center;
+      }
+      p {
+        font-size: 18px;
+      }
+      .arrow {
+        border: solid white;
+        border-width: 0 3px 3px 0;
+        display: inline-block;
+        padding: 3px;
+      }
+
+      .right {
+        transform: rotate(-45deg);
+        -webkit-transform: rotate(-45deg);
+      }
+
+      .left {
+        transform: rotate(135deg);
+        -webkit-transform: rotate(135deg);
+      }
+
+      .up {
+        transform: rotate(-135deg);
+        -webkit-transform: rotate(-135deg);
+      }
+
+      .down {
+        transform: rotate(45deg);
+        -webkit-transform: rotate(45deg);
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <!-- Study introduction and consent -->
+    {% include "hit_templates/setup.html" %}
+
+    <!-- Method introduction -->
+    <div class='container-fluid' id="part_intro" style="display: none; ">
+      <div class='container-fluid'>
+        <h1>Model introduction</h1>
+        <p>
+        We have a model that recognizes 1000 objects in photos.
+        We have access to its prediction and an explanation for it.
+        <br>
+        <b>Please carefully read this page as the remaining study depends on your understanding of the model.</b>
+        </p>
+        <br>
+        {% include "hit_templates/intro_bagnet.html" %}
+      </div>
+      <br><br>
+      <div class='container-fluid'>
+        <h3>Q. How well do you think you understand the model's reasoning process?</h3>
+        <form action="" method="post">
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective" value="1" /> <span style="font-size:18px">Very Poor</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective" value="2" /> <span style="font-size:18px">Poor</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective" value="3" /> <span style="font-size:18px">Fair</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective" value="4" /> <span style="font-size:18px">Good</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective" value="5" /> <span style="font-size:18px">Very Good</span>
+        </form>
+      </div>
+      <br>
+      <br>
+      <br>
+      <div class='container-fluid' id='button-div'>
+        <button class='btn btn-lg btn-primary' id="next_intro2task" onclick="pg_intro2task()">Next Page</button>
+      </div>
+      <br>
+      <br>
+    </div>
+
+    <!-- Main task -->
+    {% include "hit_templates/task_bagnet_nolabels.html" %}
+
+    <!-- Post-task evaluation -->
+    <div class='container-fluid' id='part_post' style="display: none;">
+      <div class='container-fluid'>
+        <h1>Post-task evaluation</h1>
+        <br>
+        <h3>Q. How well do you think you understand the model's reasoning process?</h3>
+        <form action="" method="post">
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective2" value="1" /> <span style="font-size:18px">Very Poor</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective2" value="2" /> <span style="font-size:18px">Poor</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective2" value="3" /> <span style="font-size:18px">Fair</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective2" value="4" /> <span style="font-size:18px">Good</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective2" value="5" /> <span style="font-size:18px">Very Good</span>
+        </form>
+      </div>
+      <br>
+      <br>
+      <br>
+      <div class='container-fluid' id='button-div'>
+        <button class='btn btn-lg btn-primary' id="next_post2perf" disabled onclick="pg_post2perf()">Next Page</button>
+      </div>
+    </div>
+
+
+    <!-- Your performance -->
+    <div class='container-fluid' id='part_perf' style="display: none;">
+      <div class='container-fluid'>
+        <h1>Your performance</h1>
+        <br>
+        <p>
+          You correctly selected the model&#39; predictions for <b><span id="correctcount"></span>
+          out of <span id="correcttotal"></span></b> photos in the previous task,
+          achieving <b><span id="correctacc"></span>%</b> accuracy.
+          (Random guessing will result in 25% accuracy.)
+        </p>
+        <p>
+          You identified correct classes for <b><span id="correctcount2"></span>
+          out of <span id="correcttotal2"></span></b> photos in the previous task,
+          achieving <b><span id="correctacc2"></span>%</b> accuracy.
+          (Random guessing will result in 25% accuracy.)
+        </p>
+        <br>
+        <h3>Q. How well do you think you understand the model's reasoning process?</h3>
+        <form action="" method="post">
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective3" value="1" /> <span style="font-size:18px">Very Poor</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective3" value="2" /> <span style="font-size:18px">Poor</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective3" value="3" /> <span style="font-size:18px">Fair</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective3" value="4" /> <span style="font-size:18px">Good</span>
+          <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="subjective3" value="5" /> <span style="font-size:18px">Very Good</span>
+        </form>
+        <br>
+      </div>
+      <br>
+      <br>
+      <br>
+      <div class='col-xs-12' id='button-div'>
+        <button class='btn btn-lg btn-primary' id="next_perf2choice" disabled onclick="pg_perf2choice()">Next Page</button>
+      </div>
+    </div>
+
+
+    <!-- Choose which model to use -->
+    {% include "hit_templates/choice_bagnet.html" %}
+
+    <!-- Feedback -->
+    <div class='container-fluid' id='part_feedback' style="display: none;">
+      <div class='col-xs-12'>
+        <h3>
+          Thank you for your participation!
+          <br><br>
+          Let us know if you have any feedback about this study.
+        </h3>
+        <br>
+        <textarea id='feedback-area' name='feedback-area' class='form-control tb-margin'></textarea>
+      </div>
+
+      <br>
+
+      <!-- Submit -->
+      {% include "hit_templates/simpleamt.html" %}
+    </div>
+
+
+
+    <!-- For slider -->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
+    <script>
+      $( function() {
+        // Low-risk
+        $( "#slider-low" ).slider({
+            value: 67, min: 50, max: 100, step: 1,
+            slide: function (e, ui) {document.getElementById("low_risk").innerHTML = $('#slider-low').slider("option", "value");},
+            stop: function (e, ui) {document.getElementById("low_risk").innerHTML = $('#slider-low').slider("option", "value");}
+        })
+        .each(function() {
+          var opt = $('#slider-low').data().uiSlider.options;
+          var vals = opt.max - opt.min;
+          for (var i = 0; i <= vals; i++) {
+            var el = $('<label>'+(opt.min+i)+'</label>').css('left',(i/vals*100)+'%');
+            $("#slider-low").append(el);
+          }
+        });
+        document.getElementById("low_risk").innerHTML = $('#slider-low').slider("option", "value");
+
+        // Med-risk
+        $( "#slider-med" ).slider({
+            value: 67, min: 50, max: 100, step: 1,
+            slide: function (e, ui) {document.getElementById("med_risk").innerHTML = $('#slider-med').slider("option", "value");},
+            stop: function (e, ui) {document.getElementById("med_risk").innerHTML = $('#slider-med').slider("option", "value");}
+        })
+        .each(function() {
+          var opt = $('#slider-med').data().uiSlider.options;
+          var vals = opt.max - opt.min;
+          for (var i = 0; i <= vals; i++) {
+            var el = $('<label>'+(opt.min+i)+'</label>').css('left',(i/vals*100)+'%');
+            $("#slider-med").append(el);
+          }
+        });
+        document.getElementById("med_risk").innerHTML = $('#slider-med').slider("option", "value");
+
+        // High-risk
+        $( "#slider-high" ).slider({
+            value: 67, min: 50, max: 100, step: 1,
+            slide: function (e, ui) {document.getElementById("high_risk").innerHTML = $('#slider-high').slider("option", "value");},
+            stop: function (e, ui) {document.getElementById("high_risk").innerHTML = $('#slider-high').slider("option", "value");}
+        })
+        .each(function() {
+          var opt = $('#slider-high').data().uiSlider.options;
+          var vals = opt.max - opt.min;
+          for (var i = 0; i <= vals; i++) {
+            var el = $('<label>'+(opt.min+i)+'</label>').css('left',(i/vals*100)+'%');
+            $("#slider-high").append(el);
+          }
+        });
+        document.getElementById("high_risk").innerHTML = $('#slider-high').slider("option", "value");
+      });
+
+    </script>
+
+    <script>
+
+      function movepage(div_prev, div_next) {
+        if (div_prev.style.display !== 'none') {
+          div_prev.style.display = 'none';
+          div_next.style.display = 'block';
+        }
+        else {
+          div_prev.style.display = 'block';
+          div_next.style.display = 'none';
+        }
+
+        // Jump to the top of the page
+        window.scroll({
+          top: 0,
+          left: 0,
+          behavior: 'smooth'
+        });
+      }
+
+      // Create timing object
+      timing = {};
+      timing['start'] = Date.now();
+      timing['pg_method'] = [];
+      timing['nextphoto'] = [];
+
+      // Move between pages
+      function pg_consent2demographics() {
+        timing['pg_consent2demographics'] = Date.now();
+        var div_prev = document.getElementById('part_consent');
+        var div_next = document.getElementById('part_demographics');
+        movepage(div_prev, div_next);
+      }
+      function pg_demographics2intro() {
+        timing['pg_demographics2intro'] = Date.now();
+        var div_prev = document.getElementById('part_demographics');
+        var div_next = document.getElementById('part_intro');
+        movepage(div_prev, div_next);
+      }
+      function pg_intro2task() {
+        timing['pg_intro2task'] = Date.now();
+        var div_prev = document.getElementById('part_intro');
+        var div_next = document.getElementById('part_task');
+        movepage(div_prev, div_next);
+      }
+      function pg_task2post() {
+        timing['pg_task2post'] = Date.now();
+        var div_prev = document.getElementById('part_task');
+        var div_next = document.getElementById('part_post');
+        movepage(div_prev, div_next);
+      }
+      function pg_post2perf() {
+        timing['pg_post2perf'] = Date.now();
+        var div_prev = document.getElementById('part_post');
+        var div_next = document.getElementById('part_perf');
+        movepage(div_prev, div_next);
+      }
+      function pg_perf2choice() {
+        timing['pg_perf2choice'] = Date.now();
+        var div_prev = document.getElementById('part_perf');
+        var div_next = document.getElementById('part_choice');
+        movepage(div_prev, div_next);
+      }
+      function pg_choice2feedback() {
+        timing['pg_choice2feedback'] = Date.now();
+        var div_prev = document.getElementById('part_choice');
+        var div_next = document.getElementById('part_feedback');
+        movepage(div_prev, div_next);
+      }
+      function pg_method() {
+        timing['pg_method'][timing['pg_method'].length] = Date.now();
+        var div_method = document.getElementById('part_method');
+        if (div_method.style.display == 'none') {
+          div_method.style.display = 'block';
+        }
+        else {
+          div_method.style.display = 'none';
+        }
+      }
+
+      // Define some default input.
+      var DEFAULT_INPUT = {'input_image': ['https://drive.google.com/uc?export=view&id=1IMdkYuQ5Aa26aQSiuNmfbRSQcOqI57Pw',
+      'https://drive.google.com/uc?export=view&id=11-LH_xWhtXMCLnWM2HWkwxvkXbZ-zMOo',
+      'https://drive.google.com/uc?export=view&id=1UJpS64hiMd6HXZSTcyvc9JG8n3f7Em_W',
+      'https://drive.google.com/uc?export=view&id=1wrAs2Efc29D2zxhpSLigBpFSpbQDMLSD',
+      'https://drive.google.com/uc?export=view&id=1urOY-JmWyOvrh458I162i1L1bF4Z12OB',
+      'https://drive.google.com/uc?export=view&id=1h43dl8I7ExpEnwhWpITF7s9jlWin2vvk',
+      'https://drive.google.com/uc?export=view&id=1x_5aHr46hjxDUCYRMCPrJ58Xi0dyh0Mr',
+      'https://drive.google.com/uc?export=view&id=19QuA5eHAX_d6UX4XvWySkMgLO0gV9nkT',
+      'https://drive.google.com/uc?export=view&id=1HNIhtrP5Vkad_nl3C9B69pwNXIeAaBfg',
+      'https://drive.google.com/uc?export=view&id=1TORg6_6bceH7GWlNFv1ixVOq3McC_3QO'],
+     'input_prediction': ['sliding door',
+      'bakery, bakeshop, bakehouse',
+      "jack-o'-lantern",
+      'fly',
+      'liner, ocean liner',
+      'peacock',
+      'zucchini, courgette',
+      'ashcan, trash can, garbage can, wastebin, ash bin, ash-bin, ashbin, dustbin, trash barrel, trash bin',
+      'tub, vat',
+      'oxygen mask'],
+     'ground_truth': [4, 2, 2, 3, 0, 4, 0, 2, 0, 4],
+     'predicted': [2, 3, 2, 3, 0, 4, 0, 4, 4, 2],
+     'input_id': [1]}
+
+      // Variables to record answers
+      var answers = [];
+      var descriptions = [];
+      var feedback = [];
+
+      // Some variables to track state of the HIT.
+      var enabled = false;
+      var longinput = null;
+
+      var localanswers = [];
+      var localanswers_confidence = [];
+      var localanswers2 = [];
+      var localanswers2_confidence = [];
+      var idx = 0;
+
+      var origacc = 66.7;
+      document.getElementById("origacc").innerHTML = origacc;
+      document.getElementById("origacc_copy1").innerHTML = origacc;
+      document.getElementById("origacc_copy2").innerHTML = origacc;
+      document.getElementById("origacc_copy3").innerHTML = origacc;
+
+      function record() {
+
+        timing['nextphoto'][idx] = Date.now();
+
+        localanswers[idx] = $('input[name=correct]:checked').val();
+        $("input[name=correct]:checked").removeAttr("checked");
+
+        localanswers_confidence[idx] = $('input[name=confidence]:checked').val();
+        $("input[name=confidence]:checked").removeAttr("checked");
+
+        localanswers2[idx] = $('input[name=correct2]:checked').val();
+        $("input[name=correct2]:checked").removeAttr("checked");
+
+        localanswers2_confidence[idx] = $('input[name=confidence2]:checked').val();
+        $("input[name=confidence2]:checked").removeAttr("checked");
+
+
+        // Calculate accuracy
+        var correctacclist = [];
+        var correcttotal = [];
+        for (var i = 0; i < input_image.length; ++i) {
+          if (localanswers[i] == predicted[i]) {
+            correctacclist[i] = 1;
+          } else {
+            correctacclist[i] = 0;
+          }
+          correcttotal[i] = 1;
+        }
+        var correctcount = correctacclist.reduce(function(a, b) { return Number(a) + Number(b); }, 0);
+        var correcttotal = correcttotal.reduce(function(a, b) { return Number(a) + Number(b); }, 0);
+        var correctacc = correctcount / correcttotal;
+        document.getElementById("correctcount").innerHTML = correctcount;
+        document.getElementById("correcttotal").innerHTML = correcttotal;
+        document.getElementById("correctacc").innerHTML = parseFloat(correctacc*100).toFixed(1);
+        document.getElementById("correctcount_copy").innerHTML = correctcount;
+        document.getElementById("correcttotal_copy").innerHTML = correcttotal;
+        document.getElementById("correctacc_copy").innerHTML = parseFloat(correctacc*100).toFixed(1);
+
+        // Calculate accuracy
+        var correctacclist2 = [];
+        var correcttotal2 = [];
+        for (var i = 0; i < input_image.length; ++i) {
+          if (localanswers2[i] == ground_truth[i]) {
+            correctacclist2[i] = 1;
+          } else {
+            correctacclist2[i] = 0;
+          }
+          correcttotal2[i] = 1;
+        }
+        var correctcount2 = correctacclist2.reduce(function(a, b) { return Number(a) + Number(b); }, 0);
+        var correcttotal2 = correcttotal2.reduce(function(a, b) { return Number(a) + Number(b); }, 0);
+        var correctacc2 = correctcount2 / correcttotal2;
+        document.getElementById("correctcount2").innerHTML = correctcount2;
+        document.getElementById("correcttotal2").innerHTML = correcttotal2;
+        document.getElementById("correctacc2").innerHTML = parseFloat(correctacc2*100).toFixed(1);
+        document.getElementById("correctcount2_copy").innerHTML = correctcount2;
+        document.getElementById("correcttotal2_copy").innerHTML = correcttotal2;
+        document.getElementById("correctacc2_copy").innerHTML = parseFloat(correctacc2*100).toFixed(1);
+      }
+
+
+      $(function() {
+
+        $("input[name='consent']").change(function(){next_consent2demographics.disabled = false;});
+        $("input[name='ml_exp']").change(function(){next_demographics2intro.disabled = false;});
+        $("input[name='subjective']").change(function(){next_intro2task.disabled = false;});
+        $("input[name='subjective2']").change(function(){next_post2perf.disabled = false;});
+        $("input[name='subjective3']").change(function(){next_perf2choice.disabled = false;});
+        $("input[name='correct']").change(function(){
+          if ($("input[name='correct']").is(":checked") &&
+              $("input[name='confidence']").is(":checked") &&
+              $("input[name='correct2']").is(":checked") &&
+              $("input[name='confidence2']").is(":checked")) {
+            if (idx != 9) {next_btn.disabled = false;}
+            if (idx == 9) {next_task2post.disabled = false;}
+          }
+        });
+        $("input[name='confidence']").change(function(){
+          if ($("input[name='correct']").is(":checked") &&
+              $("input[name='confidence']").is(":checked") &&
+              $("input[name='correct2']").is(":checked") &&
+              $("input[name='confidence2']").is(":checked")) {
+            if (idx != 9) {next_btn.disabled = false;}
+            if (idx == 9) {next_task2post.disabled = false;}
+          }
+        });
+        $("input[name='correct2']").change(function(){
+          if ($("input[name='correct']").is(":checked") &&
+              $("input[name='confidence']").is(":checked") &&
+              $("input[name='correct2']").is(":checked") &&
+              $("input[name='confidence2']").is(":checked")) {
+            if (idx != 9) {next_btn.disabled = false;}
+            if (idx == 9) {next_task2post.disabled = false;}
+          }
+        });
+        $("input[name='confidence2']").change(function(){
+          if ($("input[name='correct']").is(":checked") &&
+              $("input[name='confidence']").is(":checked") &&
+              $("input[name='correct2']").is(":checked") &&
+              $("input[name='confidence2']").is(":checked")) {
+            if (idx != 9) {next_btn.disabled = false;}
+            if (idx == 9) {next_task2post.disabled = false;}
+          }
+        });
+
+        function main() {
+          // If this is a HIT on AMT, then replace the default input with the real input.
+          longinput = simpleamt.getInput(DEFAULT_INPUT);
+
+          input_image = longinput['input_image']
+          input_prediction = longinput['input_prediction']
+          ground_truth = longinput['ground_truth']
+          predicted = longinput['predicted']
+          input_id = longinput['input_id'][0]
+
+          // Enable the UI if the HIT is not in preview mode.
+          if (!simpleamt.isPreview()) {enable_hit();}
+
+          // Set up the descriptions.
+          _.each(input, function() { descriptions.push(''); });
+          _.each(input, function() { feedback.push(''); });
+
+          // Preload all images
+          _.each(input_image, function(img_url) {
+            var img = new Image();
+            img.onload = function() { console.log('loaded image from ' + img_url); };
+            img.src = img_url;
+          });
+
+          render();
+        }
+
+        // Use the current index to update the image and description
+        function render() {
+
+          // Jump to the top of the page
+          window.scroll({
+            top: 0,
+            left: 0,
+            behavior: 'smooth'
+          });
+
+          // Set up prediction
+          // document.getElementById("label").innerHTML = input_prediction[idx];
+
+          // Set up the image
+          $('#testimage-container').empty();
+          $('<img>').attr({
+            'src':input_image[idx], 'width':'100%', 'align':'center'
+          }).appendTo($('#testimage-container'));
+
+          // Set up the text area
+          $('#text-area').val(descriptions);
+          $('#feedback-area').val(feedback);
+
+          // Refresh the counter
+          $('.counter-top').text(idx + 1);
+          $('.counter-bottom').text(input_image.length);
+
+        }
+
+        // Save the input and update the index
+        function set_idx(new_idx) {
+          if (new_idx < 0 || new_idx >= input_image.length) return;
+          idx = new_idx;
+          render();
+        }
+
+        // Enable the UI.
+        function enable_hit() {
+          enabled = true;
+
+          // Enable components
+          $('#next_btn').click(function() {
+            $('input[name=correct]').prop('checked',false);
+            $('input[name=confidence]').prop('checked',false);
+            $('input[name=correct2]').prop('checked',false);
+            $('input[name=confidence2]').prop('checked',false);
+            next_btn.disabled = true;
+            set_idx(idx+1)
+          });
+
+          $('#text-area').prop('disabled', false);
+          $('#feedback-area').prop('disabled', false);
+          $('#submit-btn').prop('disabled', false);
+
+          // Set up submit handler.
+          simpleamt.setupSubmit();
+          $('#submit-btn').click(function() {
+
+            timing['submit'] = Date.now();
+
+            // Choice answers
+            ml_exp = $('input[name=ml_exp]:checked').val();
+            subjective = $('input[name=subjective]:checked').val();
+            subjective2 = $('input[name=subjective2]:checked').val();
+            subjective3 = $('input[name=subjective3]:checked').val();
+
+            // distinguish
+            correctcount = document.getElementById("correctcount").innerHTML;
+            correctacc = []
+            correctacc.push(document.getElementById("correctacc").innerHTML);
+            correctcount2 = document.getElementById("correctcount2").innerHTML;
+            correctacc2 = []
+            correctacc2.push(document.getElementById("correctacc2").innerHTML);
+
+            // sliders
+            low_risk = [];
+            med_risk = [];
+            high_risk = [];
+            low_risk.push(document.getElementById("low_risk").innerHTML);
+            med_risk.push(document.getElementById("med_risk").innerHTML);
+            high_risk.push(document.getElementById("high_risk").innerHTML);
+
+
+            gender = [];
+            race = [];
+
+            if ($('input[name=gender]:checked').length > 0) {
+              gender.push($('input[name=gender]:checked').val());
+            }
+            else {
+              gender.push("");
+            };
+            if ($('input[name=race]:checked').length > 0) {
+              race.push($('input[name=race]:checked').val());
+            }
+            else {race.push("");};
+
+            if (gender.length === 0) {gender = [''];};
+            if (race.length === 0) {race = [''];};
+
+            gender_written = []
+            gender_written.push($('#genderdescribe').val());
+
+            // Descriptions of reasons
+            descriptions = []
+            descriptions.push($('#text-area').val());
+            feedback = []
+            feedback.push($('#feedback-area').val());
+
+            // Return output
+            var output = _.map(_.zip(ml_exp,
+              subjective, subjective2, subjective3,
+              correctcount, correctacc,
+              correctcount2, correctacc2,
+              low_risk, med_risk, high_risk,
+              descriptions,
+              gender, gender_written, race,
+              feedback), function(x) {
+                return {'ml_exp': x[0],
+                'subjective': x[1], 'subjective2': x[2], 'subjective3': x[3],
+                'correctcount': x[4], 'corectacc': x[5],
+                'correctcount2': x[6], 'corectacc2': x[7],
+                'low_risk': x[8], 'med_risk':x[9], 'high_risk':x[10],
+                'descriptions': x[11],
+                'gender': x[12], 'gender_written': x[13],
+                'race': x[14], 'feedback': x[15]};
+              });
+            // output.push({"input": longinput});
+            output.push({"input": input_id});
+            output.push({"individual_answers": localanswers});
+            output.push({"individual_answers_confidence": localanswers_confidence});
+            output.push({"individual2_answers": localanswers});
+            output.push({"individual2_answers_confidence": localanswers_confidence});
+            output.push({"timing": timing});
+            simpleamt.setOutput(output);
+          });
+        }
+
+        main();
+
+      });
+    </script>
+  </body>
+</html>

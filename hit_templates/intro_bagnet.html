@@ -1,0 +1,71 @@
+<div class='container-fluid'>
+  <div class='col-xs-10'>
+    <h2>BagNet</h2>
+    <p>
+      The BagNet model recognizes an object based on small regions.
+      This allows us to analyze how each region influences the model&#39;s prediction.
+      For each class (e.g., parachute, hummingbird, printer),
+      BagNet calculates class evidence from different regions.
+      BagNet looks at all regions in the photo and creates a heatmap for each class
+      where higher values, shown as darker red, mean higher evidence for the class.
+      BagNet then sums the values in the heatmap and chooses the class with the highest value as its prediction.
+    </p>
+  </div>
+</div>
+<br>
+<div class='container-fluid'>
+  <div class='col-xs-10'>
+    <p>
+      For the first photo of a <b>parachute</b>,
+      the model <i>correctly</i> classifies it as a <b>parachute</b>.
+      You can see that model predicts <b>parachute</b> since its heatmap is the most red.
+      On the other hand, the heatmaps of <b>hummingbird</b> and <b>military plane</b> are less red,
+      which means that the model found less evidence for these classes.
+    </p>
+  </div>
+</div>
+<br>
+<div class='container-fluid'>
+  <div class='col-xs-10'>
+    <img src="https://drive.google.com/uc?export=view&id=1TaedzfuYVJ1qIy3E82XVnpPN8s8viG3X" width=100%>
+  </div>
+</div>
+<br><br>
+<div class='container-fluid'>
+  <div class='col-xs-10'>
+    <p>
+      For the second photo of a <b>printer</b>, the model <i>incorrectly</i>
+      classifies it as a <b>home theater</b>.
+      You can see that model predicts <b>home theater</b> since its heatmap is the most red.
+      The heatmaps rveal that the model found relatively less evidence for <b>printer</b> and <b>speaker</b>.
+    </p>
+  </div>
+</div>
+<br>
+<div class='container-fluid'>
+  <div class='col-xs-10'>
+    <img src="https://drive.google.com/uc?export=view&id=1l-P-X4wOFyRSb0iaVpXN1LHdJik93fxf" width=100%>
+  </div>
+</div>
+
+
+
+
+<!-- <h2>BagNet</h2>
+<p>
+  The BagNet model recognizes an object based on small regions.
+  This allows us to analyze how each region influences the model&#39;s prediction.
+  For each class (e.g., parachute, hummingbird, steam locomotive),
+  BagNet calculates class evidence from different regions.
+  BagNet looks at all regions in the photo and creates a heatmap for each class
+  where higher values, shown as darker red, mean higher evidence for the class.
+  BagNet then sums the values in the heatmap and chooses the class with the highest value as its prediction.
+  <br><br>
+  For each photo below, we show BagNet heatmaps for three classes.
+  We see that the heatmap of the correct class, <b>parachute</b> in the top and
+  <b>steam locomotive</b> in the bottom, is the most red.
+</p>
+<br>
+<div class='col-xs-9'>
+  <img src="https://drive.google.com/uc?export=view&id=1MfuajqYB6lV6yQyz6GrUcJR7ojG1vYdw" width=100%>
+</div> -->

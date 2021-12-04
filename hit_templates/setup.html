@@ -1,0 +1,91 @@
+<!-- Introduction and Consent -->
+<div class='container-fluid' id="part_consent" style="display: block; ">
+  <div class='container-fluid'>
+    <div class='col-xs-10'>
+      <h1>Study introduction</h1>
+      <p>
+        In this study, we aim to evaluate the interpretability of computer vision models.
+        We will provide explanations of how a model makes its prediction
+        and ask you to evaluate how interpretable it is through several questions and tasks.
+        The expected duration of the study is 5-20 minutes.
+      </p>
+      <br>
+      <h1>Consent</h1>
+      <p>
+        Please read the consent form.
+        If you understand and consent to these terms, click "I Accept" to continue.
+      </p>
+    </div>
+  </div>
+  <div class='container-fluid'>
+    <div class='col-xs-10 text-center'>
+      <embed src="" type="application/pdf" width="100%" height="100%">
+      <br>
+      <input type="radio" style="height:24px; width:24px; vertical-align:top;" name="consent"/>
+      <span style="font-size:24px; font-weight:bold">&nbsp; I Accept</span><br>
+    </div>
+  </div>
+  <br>
+  <br>
+  <div class='container-fluid'>
+    <button class='btn btn-lg btn-primary' id="next_consent2demographics" disabled onclick="pg_consent2demographics();">Next Page</button>
+  </div>
+  <br>
+  <br>
+</div>
+
+<!-- Demographics -->
+<div class='container-fluid' id="part_demographics" style="display: none; ">
+  <div class='container-fluid'>
+    <h1>Demographics and background</h1>
+    <br>
+    <h3>Q. Demographics (Optional)</h3>
+    <div class='container-fluid'>
+      <div class='row'>
+        <div class='col-xs-4'>
+          <h3>Gender identity</h3>
+          <form action="" method="post">
+            <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="gender" value="Man" /> <span style="font-size:18px">Man</span><br>
+            <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="gender" value="Non-binary" /> <span style="font-size:18px">Non-binary</span><br>
+            <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="gender" value="Woman" /> <span style="font-size:18px">Woman</span><br>
+            <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="gender" value="Self-describe" /> <span style="font-size:18px">Prefer to self-describe below</span><br>
+          </form>
+          <form action="" method="post">
+            <input type="text" id="genderdescribe" name="genderdescribe">
+          </form>
+        </div>
+
+        <div class='col-xs-8'>
+          <h3>Race and ethnicity (select one or more)</h3>
+          <form action="" method="post">
+            <input type="checkbox"  style="height:18px; width:18px; vertical-align:top;" name="race" value="American Indian or Alaska Native" /> <span style="font-size:18px">American Indian or Alaska Native</span><br>
+            <input type="checkbox" style="height:18px; width:18px; vertical-align:top;" name="race" value="Asian" /> <span style="font-size:18px">Asian</span><br>
+            <input type="checkbox" style="height:18px; width:18px; vertical-align:top;" name="race" value="Black or African American" /> <span style="font-size:18px">Black or African American</span><br>
+            <input type="checkbox" style="height:18px; width:18px; vertical-align:top;" name="race" value="Native Hawaiian or Other Pacific Islander" /> <span style="font-size:18px">Native Hawaiian or Other Pacific Islander</span><br>
+            <input type="checkbox" style="height:18px; width:18px; vertical-align:top;" name="race" value="White" /> <span style="font-size:18px">White</span><br>
+            <input type="checkbox" style="height:18px; width:18px; vertical-align:top;" name="race" value="Hispanic or Latino or Spanish Origin of any race" /> <span style="font-size:18px">Hispanic or Latino or Spanish Origin of any race</span><br>
+          </form>
+        </div>
+      </div>
+    </div>
+    <br>
+    <br>
+    <h3>Q. How much experience do you have with machine learning (ML)?</h3>
+    <form action="" method="post">
+      <input type="radio"  style="height:18px; width:18px; vertical-align:top;" name="ml_exp" value="1" /> <span style="font-size:18px">I don't know anything about ML</span><br>
+      <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="ml_exp" value="2" /> <span style="font-size:18px">I have heard about a few ML concepts or applications</span><br>
+      <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="ml_exp" value="3" /> <span style="font-size:18px">I know the basics of ML and can hold a short conversation about it</span><br>
+      <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="ml_exp" value="4" /> <span style="font-size:18px">I have taken a course on ML and/or have experience working with a ML system</span><br>
+      <input type="radio" style="height:18px; width:18px; vertical-align:top;" name="ml_exp" value="5" /> <span style="font-size:18px">I often use and study ML in my life</span><br>
+    </form>
+  </div>
+  <br>
+  <br>
+  <br>
+  <br>
+  <div class='col-xs-12' id='button-div'>
+    <button class='btn btn-lg btn-primary' id="next_demographics2intro" disabled onclick="pg_demographics2intro()">Next Page</button>
+  </div>
+  <br>
+  <br>
+</div>
