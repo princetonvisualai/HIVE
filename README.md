@@ -1,12 +1,12 @@
 # HIVE: Evaluating the Human Interpretability of Visual Explanations
 
 
-### [Project Page](https://princetonvisualai.github.io/HIVE/) | [Paper](https://arxiv.org/abs/2112.03184) | [Extended abstract](https://drive.google.com/file/d/1nOYfy_0e61cGGDzwreCI4IUly1VbTgur/view?usp=sharing) | [2min Talk](https://youtu.be/BDlFb1CFQRQ)
+### [Project Page](https://princetonvisualai.github.io/HIVE/) | [Paper](https://arxiv.org/abs/2112.03184) | [Supplementary material](https://github.com/princetonvisualai/HIVE/blob/main/HIVE_suppmat.pdf) | [Extended abstract](https://drive.google.com/file/d/1nOYfy_0e61cGGDzwreCI4IUly1VbTgur/view?usp=sharing) | [2min talk](https://youtu.be/BDlFb1CFQRQ) | [8min talk](https://youtu.be/7uysq-qAtr4)
 
-This repo provides the code for HIVE, a human evaluation framework for interpretability methods in computer vision.
+This repo provides the code for HIVE, a human evaluation framework for computer vision interpretability methods.
 
 ```
-@inproceedings{kim2021hive,
+@inproceedings{Kim2022HIVE,
   author = {Sunnie S. Y. Kim and Nicole Meister and Vikram V. Ramaswamy and Ruth Fong and Olga Russakovsky},
   title = {{HIVE}: Evaluating the Human Interpretability of Visual Explanations},
   booktitle = {European Conference on Computer Vision (ECCV)},
