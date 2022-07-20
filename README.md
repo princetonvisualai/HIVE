@@ -6,12 +6,11 @@
 This repo provides the code for HIVE, a human evaluation framework for interpretability methods in computer vision.
 
 ```
-@article{kim2021hive,
+@inproceedings{kim2021hive,
   author = {Sunnie S. Y. Kim and Nicole Meister and Vikram V. Ramaswamy and Ruth Fong and Olga Russakovsky},
   title = {{HIVE}: Evaluating the Human Interpretability of Visual Explanations},
-  journal = {CoRR},
-  volume = {abs/2112.03184},
-  year = {2021}
+  booktitle = {European Conference on Computer Vision (ECCV)},
+  year = {2022}
 }
 ```
 
