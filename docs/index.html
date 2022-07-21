@@ -37,7 +37,7 @@
       &nbsp;
       <span style="font-size:18px"><a href="https://www.cs.princeton.edu/~olgarus/" style="color:#1075bc" target="new">Olga Russakovsky</a></span>
       <br>
-      <span style="font-size:18px">Princeton University</span>
+      <span style="font-size:18px">Princeton University, Princeton NJ 08544, USA </span>
       <br>
       <span style="font-size:18px">{sunniesuhyoung, nmeister, vr23, ruthfong, olgarus}@princeton.edu<br><br></span>
     </div>
@@ -46,17 +46,17 @@
 
 <!-- Figure 1 -->
 <div class="row" style="text-align:center;padding:0;margin:0">
-  <img src="imgs/explanations.png" style="width:60%">
+  <img src="imgs/explanations.png" style="width:55%">
 </div>
 <div class="container">
   (Top left) Heatmap explanations by GradCAM and BagNet highlight decision-relevant image regions.
-  (Bottom left) Prototype-based explanations by ProtoPNet and ProtoTree match image regions to canonical prototypes.
-  This schematic is a much simplified version of the actual explanation.
-  (Right) Example ProtoPNet explanation taken from the original paper. The full explanation has up to 10 rows.
-  <i>
-    Existing evaluation metrics typically apply to one explanation form (e.g., only heatmaps). 
-    We design HIVE to evaluate diverse visual interpretability methods and enable cross-method comparison.
-  </i>        
+  (Bottom left) Prototype-based explanations by ProtoPNet and ProtoTree match image regions to prototypical parts learned during training.
+  This schematic is much simpler than actual explanations.
+  (Right) Actual ProtoPNet explanation example from the original paper.
+  <b>
+    While existing evaluation methods typically apply to only one explanation form, 
+    HIVE evaluates and compares diverse interpretability methods.
+  </b>        
 </div>
 
   
@@ -70,12 +70,21 @@
   <div class="row">
     <div class="col-lg-0 col-md-0 col-sm-0"></div>
           
-    <div class="col-xs-2 col-xs-offset-2 text-center">
+    <div class="col-xs-2 text-center">
       <div class="service-box mt-5 mx-auto">
         <a href="https://arxiv.org/abs/2112.03184" target="_blank">
           <i class="fa fa-4x fa-file-text-o text-primary mb-3"></i>
         </a>
         <h4 class="mb-3" style="font-size:18px">Paper</h4>
+      </div>
+    </div>
+    
+    <div class="col-xs-2 text-center">
+      <div class="service-box mt-5 mx-auto">
+        <a href="https://github.com/princetonvisualai/HIVE/blob/main/HIVE_suppmat.pdf" target="_blank">
+          <i class="fa fa-4x fa-file-text-o text-primary mb-3"></i>
+        </a>
+        <h4 class="mb-3" style="font-size:18px">Supplementary Material</h4>
       </div>
     </div>
     
@@ -94,6 +103,15 @@
           <i class="fa fa-4x fa-video-camera text-primary mb-3"></i>
         </a>
         <h4 class="mb-3" style="font-size:18px">2min Talk</h4>
+      </div>
+    </div>  
+    
+    <div class="col-xs-2 text-center">
+      <div class="service-box mt-5 mx-auto">
+        <a href="https://youtu.be/7uysq-qAtr4" target="_blank">
+          <i class="fa fa-4x fa-video-camera text-primary mb-3"></i>
+        </a>
+        <h4 class="mb-3" style="font-size:18px">8min Talk</h4>
       </div>
     </div>  
     
@@ -131,31 +149,32 @@
 <!-- Abstract -->
 <div class="container">
   <h2>Abstract</h2>
-  As machine learning is increasingly applied to high-impact, high-risk domains, 
+  As AI technology is increasingly applied to high-impact, high-risk domains, 
   there have been a number of new methods aimed at making AI models more human interpretable. 
   Despite the recent growth of interpretability work, there is a lack of systematic 
-  evaluation of proposed techniques. In this work, we propose HIVE (Human Interpretability 
-  of Visual Explanations), a novel human evaluation framework for visual interpretability 
-  methods that allows for falsifiable hypothesis testing, cross-method comparison, and 
-  human-centered evaluation. To the best of our knowledge, this is the first work of its kind. 
-  Using HIVE, we conduct IRB-approved human studies with nearly 1000 participants and evaluate 
-  four methods that represent the diversity of computer vision interpretability works: 
-  GradCAM, BagNet, ProtoPNet, and ProtoTree. Our results suggest that explanations engender 
-  human trust, even for incorrect predictions, yet are not distinct enough for users to 
-  distinguish between correct and incorrect predictions. We open-source HIVE to enable 
-  future studies and to encourage more human-centered approaches to interpretability research.
+  evaluation of proposed techniques. In this work, we introduce HIVE 
+  (Human Interpretability of Visual Explanations), a novel human evaluation 
+  framework that assesses the utility of explanations to human users in 
+  AI-assisted decision making scenarios, and enables falsifiable hypothesis testing, 
+  cross-method comparison, and human-centered evaluation of visual interpretability methods. 
+  To the best of our knowledge, this is the first work of its kind. Using HIVE, we conduct 
+  IRB-approved human studies with nearly 1000 participants and evaluate four methods 
+  that represent the diversity of computer vision interpretability works: GradCAM, BagNet, 
+  ProtoPNet, and ProtoTree. Our results suggest that explanations engender human trust, 
+  even for incorrect predictions, yet are not distinct enough for users to distinguish 
+  between correct and incorrect predictions. We open-source HIVE to enable future studies 
+  and encourage more human-centered approaches to interpretability research.
 </div>
   
 <!-- Citation -->
 <div class="container">
   <h2>Citation</h2>
   <pre><code>
-    @article{kim2021hive,
-        author = {Sunnie S. Y. Kim and Nicole Meister and Vikram V. Ramaswamy and Ruth Fong and Olga Russakovsky},
-        title = {{HIVE}: Evaluating the Human Interpretability of Visual Explanations},
-        journal = {CoRR},
-        volume = {abs/2112.03184},
-        year = {2021}
+    @inproceedings{Kim2022HIVE,
+      author = {Sunnie S. Y. Kim and Nicole Meister and Vikram V. Ramaswamy and Ruth Fong and Olga Russakovsky},
+      title = {{HIVE}: Evaluating the Human Interpretability of Visual Explanations},
+      booktitle = {European Conference on Computer Vision (ECCV)},
+      year = {2022}
     }
   </code></pre>
 </div>
@@ -176,7 +195,7 @@
   
   In particular, we focus on AI-assisted decision making scenarios where humans use an AI (image classification) model 
   and an interpretability method to make decisions about whether the model prediction is correct or more generally 
-  about whether to use the model and/or interpretability method. We evaluate how useful a given interpretability 
+  about whether to use the model. We evaluate how useful a given interpretability 
   method is in these scenarios through the following tasks.
   
   <br />
@@ -236,21 +255,21 @@
   <br />
   <br />
   
-  2. When given multiple model predictions and explanations, participants struggle to distinguish between 
-  correct and incorrect predictions based on the explanations. This suggests that interpretability works need to 
-  improve and evaluate their ability to identify and explain model errors.
+  2. When given multiple model predictions and explanations, participants struggle to distinguish 
+  between correct and incorrect predictions based on the explanations. 
+  This result suggests that interpretability methods need to be improved to be reliably useful for AI-assisted decision making.
   
   <br />
   <br />
   
-  3. We quantify prior work’s anecdotal observation that there exists a gap between prototype-based models’ 
-  similarity scores and human judgments of similarity which can hurt the quality of their interpretability.
+  3. There exists a gap between the similarity judgments of humans and prototype-based models 
+  which can hurt the quality of their interpretability.
   
   <br />
   <br />
   
-  4. Participants prefer a model with an explanation over a baseline model that doesn't come with an explanation. 
-  Before switching their preference, they require a baseline model to have higher accuracy and by a greater margin for higher-risk settings.
+  4. Participants prefer to use a model with explanations over a baseline model without explanations. 
+  To switch their preference, they require the baseline model to have +6.2% to +10.9% higher accuracy.
   
   <br />
   <br />
@@ -321,13 +340,15 @@
 <div class="container">
   <h2>Acknowledgements</h2>
   
-  This work is supported by the National Science Foundation Grant No. 1763642 to OR, 
-  the Princeton SEAS Howard B. Wentz, Jr. Junior Faculty Award to OR, 
-  the Princeton SEAS Project X Fund to RF and OR,
-  and the Princeton SEAS and ECE Senior Thesis Funding to NM.
+  This material is based upon work partially supported by the National Science Foundation (NSF) 
+  under Grant No. 1763642. Any opinions, findings, and conclusions or recommendations expressed 
+  in this material are those of the author(s) and do not necessarily reflect the views of the NSF.
+  We also acknowledge support from the Princeton SEAS Howard B. Wentz, Jr. Junior Faculty Award (OR), 
+  Princeton SEAS Project X Fund (RF, OR), Open Philanthropy (RF, OR), and Princeton SEAS and ECE Senior Thesis Funding (NM).
   We thank the authors of [1, 2, 3, 4, 5] for open-sourcing their code and the authors of [2, 4, 5, 6] for sharing their trained models.
-  We also thank the AMT workers who participated in our studies, as well as the Princeton Visual AI Lab members 
-  (Dora Zhao, Kaiyu Yang, Angelina Wang, and others) who tested our user interface and provided helpful feedback.
+  We also thank the AMT workers who participated in our studies, anonymous reviewers who provided thoughtful feedback, 
+  and Princeton Visual AI Lab members (especially Dora Zhao, Kaiyu Yang, and Angelina Wang) who tested our user 
+  interface and provided helpful suggestions.
   
 </div>
   
