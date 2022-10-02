@@ -1,7 +1,7 @@
 # HIVE: Evaluating the Human Interpretability of Visual Explanations
 
 
-### [Project Page](https://princetonvisualai.github.io/HIVE/) | [Paper](https://arxiv.org/abs/2112.03184) | [Supplementary material](https://github.com/princetonvisualai/HIVE/blob/main/HIVE_suppmat.pdf) | [Extended abstract](https://drive.google.com/file/d/1nOYfy_0e61cGGDzwreCI4IUly1VbTgur/view?usp=sharing) | [2min talk](https://youtu.be/BDlFb1CFQRQ) | [8min talk](https://youtu.be/7uysq-qAtr4)
+### [Project Page](https://princetonvisualai.github.io/HIVE/) | [Paper](https://arxiv.org/abs/2112.03184) | [Supplementary material](https://github.com/princetonvisualai/HIVE/blob/main/materials/HIVE_suppmat.pdf) | [Extended abstract](https://drive.google.com/file/d/1nOYfy_0e61cGGDzwreCI4IUly1VbTgur/view?usp=sharing) | [2min talk](https://youtu.be/BDlFb1CFQRQ) | [4min talk](https://youtu.be/Wm-r-jtSrF8) | [8min talk](https://youtu.be/7uysq-qAtr4)
 
 This repo provides the code for HIVE, a human evaluation framework for computer vision interpretability methods.
 
